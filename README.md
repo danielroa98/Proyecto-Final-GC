@@ -3,6 +3,6 @@
 ## Our story so far...
 El imperio galactico se aproxima y no hay nadie que los pueda salvar,
 
-el general Pingu, experto en el pilotaje de las naves _uWu_, ha desaparecido.
+el general Pingu, experto en el pilotaje de las naves _UwU_, ha desaparecido.
 
 ¡Sólo tu podrás salvar a la Republica!
