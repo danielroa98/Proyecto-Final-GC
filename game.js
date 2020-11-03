@@ -5,7 +5,7 @@ let orbitControls = null;
 let cube = null;
 
 let objLoader = null;
-let objModelUrl = {obj:'../models/lego.obj', map:'../models/lego_face.png'};
+let objModelUrl = {obj:'../models/pingu.obj', map:'../models/pingu_tex.bmp'};
 let shipHolder = null;
 
 function initControls() {
@@ -50,7 +50,8 @@ async function loadObj(objModelUrl) {
 		object.traverse(function (child) {
 			if (child instanceof THREE.Mesh) {
 				child.material.map = texture;
-				child.scale.set(0.1, 0.1, 0.1);
+				child.scale.set(0.5, 0.5, 0.5);
+				child.rotation.y = -Math.PI/2
 			}
 		});
 		shipHolder.add(object);
