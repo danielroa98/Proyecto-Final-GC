@@ -4,22 +4,61 @@ let camera = null;
 let orbitControls = null;
 let cube = null;
 
+let objLoader = null;
+let objModelUrl = {obj:'../models/lego.obj', map:'../models/lego_face.png'};
+let shipHolder = null;
+
 function initControls() {
 	document.addEventListener("keydown", (e) => {
 		if(e.key == "d") {
-			cube.position.x += 0.5;
+			shipHolder.position.x += 0.5;
 		} else if(e.key == "a") {
-			cube.position.x -= 0.5;
+			shipHolder.position.x -= 0.5;
 		}
 	});
 
 	document.addEventListener("keydown", (e) => {
 		if(e.key == "w") {
-			cube.position.y += 0.5;
+			shipHolder.position.y += 0.5;
 		} else if(e.key == "s") {
-			cube.position.y -= 0.5;
+			shipHolder.position.y -= 0.5;
 		}
 	});
+}
+
+function promisifyLoader (loader, onProgress) {
+	function promiseLoader(url) {
+	  return new Promise((resolve, reject) => {
+		loader.load(url, resolve, onProgress, reject);
+	  });
+	}
+  
+	return {
+	  originalLoader: loader,
+	  load: promiseLoader,
+	};
+}
+
+async function loadObj(objModelUrl) {
+	const objPromiseLoader = promisifyLoader(new THREE.OBJLoader());
+
+	try {
+		const object = await objPromiseLoader.load(objModelUrl.obj);
+		
+		let texture = objModelUrl.hasOwnProperty('map') ? new THREE.TextureLoader().load(objModelUrl.map) : null;
+		
+		object.traverse(function (child) {
+			if (child instanceof THREE.Mesh) {
+				child.material.map = texture;
+				child.scale.set(0.1, 0.1, 0.1);
+			}
+		});
+		shipHolder.add(object);
+
+	}
+	catch (err) {
+		return onError(err);
+	}
 }
 
 function run() {
@@ -64,9 +103,8 @@ function createScene(canvas) {
 	let ambientLight = new THREE.AmbientLight (0xffffff, 0.2);
 	scene.add(ambientLight);
 
-	let cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
-	let cubeTexture = new THREE.MeshPhongMaterial({color: "blue"});
-	cube = new THREE.Mesh(cubeGeometry, cubeTexture);;
+	shipHolder = new THREE.Object3D();
+	loadObj(objModelUrl);
 
-	scene.add(cube)
+	scene.add(shipHolder);
 }
