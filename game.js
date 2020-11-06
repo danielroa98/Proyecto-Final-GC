@@ -8,17 +8,32 @@ let objLoader = null;
 let objModelUrl = {obj:'../models/pingu.obj', map:'../models/pingu_tex.bmp'};
 let shipHolder = null;
 
+let wKey = false, sKey = false, aKey = false, dKey = false;
+
+let moveSpeed = 33;
+
 function initControls() {
 	document.addEventListener("keydown", (e) => {
 		if(e.key == "d") {
-			moveRight();
+			dKey = true;
 		} else if(e.key == "a") {
-			moveLeft();
-		}
-		else if(e.key == "w") {
-			moveUp();
+			aKey = true;
+		} else if(e.key == "w") {
+			wKey = true;
 		} else if(e.key == "s") {
-			moveDown();
+			sKey = true;
+		}
+	});
+
+	document.addEventListener("keyup", (e) => {
+		if(e.key == "d") {
+			dKey = false;
+		} else if(e.key == "a") {
+			aKey = false;
+		} else if(e.key == "w") {
+			wKey = false;
+		} else if(e.key == "s") {
+			sKey = false;
 		}
 	});
 }
@@ -66,7 +81,9 @@ function run() {
 	// Render the scene
 	renderer.render(scene, camera);
 
-	KF.update()
+	KF.update();
+
+	animate();
 
 	// Update the camera controller
 	orbitControls.update();
@@ -110,9 +127,45 @@ function createScene(canvas) {
 	scene.add(shipHolder);
 }
 
+function animate() {
+	if(dKey && wKey) {
+		if(shipHolder.position.x < 19 && shipHolder.position.y < 15) {
+			moveRightUp();
+		}
+	} else if (dKey && sKey) {
+		if(shipHolder.position.x < 19 && shipHolder.position.y > -1) {
+			moveRightDown();
+		}
+	} else if (aKey && wKey) {
+		if(shipHolder.position.x > -19 && shipHolder.position.y < 15) {
+			moveLeftUp();
+		}
+	} else if (aKey && sKey) {
+		if(shipHolder.position.x > -19 && shipHolder.position.y > -1) {
+			moveLeftDown();
+		}
+	} else if(dKey) {
+		if(shipHolder.position.x < 19) {
+			moveRight()
+		}
+	} else if(aKey) {
+		if(shipHolder.position.x > -19) {
+			moveLeft()
+		}
+	} else if(wKey) {
+		if(shipHolder.position.y < 15) {
+			moveUp()
+		}
+	} else if(sKey) {
+		if(shipHolder.position.y > -1) {
+			moveDown()
+		}
+	}
+}
+
 function moveRight() {
-	let moveRightAnimation = new KF.KeyFrameAnimator;
-	moveRightAnimation.init({ 
+	let move = new KF.KeyFrameAnimator;
+	move.init({ 
 		interps:
 			[
 				{ 
@@ -125,14 +178,14 @@ function moveRight() {
 				},
 			],
 		loop: false,
-		duration: 100
+		duration: moveSpeed
 	});
-	moveRightAnimation.start();
+	move.start();
 }
 
 function moveLeft() {
-	let moveLeftAnimation = new KF.KeyFrameAnimator;
-	moveLeftAnimation.init({ 
+	let move = new KF.KeyFrameAnimator;
+	move.init({ 
 		interps:
 			[
 				{ 
@@ -145,14 +198,14 @@ function moveLeft() {
 				},
 			],
 		loop: false,
-		duration: 100
+		duration: moveSpeed
 	});
-	moveLeftAnimation.start();
+	move.start();
 }
 
 function moveUp() {
-	let moveUpAnimation = new KF.KeyFrameAnimator;
-	moveUpAnimation.init({ 
+	let move = new KF.KeyFrameAnimator;
+	move.init({ 
 		interps:
 			[
 				{ 
@@ -165,14 +218,14 @@ function moveUp() {
 				},
 			],
 		loop: false,
-		duration: 100
+		duration: moveSpeed
 	});
-	moveUpAnimation.start();
+	move.start();
 }
 
 function moveDown() {
-	let moveDownAnimation = new KF.KeyFrameAnimator;
-	moveDownAnimation.init({ 
+	let move = new KF.KeyFrameAnimator;
+	move.init({ 
 		interps:
 			[
 				{ 
@@ -185,7 +238,87 @@ function moveDown() {
 				},
 			],
 		loop: false,
-		duration: 100
+		duration: moveSpeed
 	});
-	moveDownAnimation.start();
+	move.start();
+}
+
+function moveRightUp() {
+	let move = new KF.KeyFrameAnimator;
+	move.init({ 
+		interps:
+			[
+				{ 
+					keys:[0, 1], 
+					values:[
+						{x : shipHolder.position.x, y : shipHolder.position.y},
+						{x : shipHolder.position.x + 1, y : shipHolder.position.y + 1},
+					],
+					target:shipHolder.position
+				},
+			],
+		loop: false,
+		duration: moveSpeed
+	});
+	move.start();
+}
+
+function moveRightDown() {
+	let move = new KF.KeyFrameAnimator;
+	move.init({ 
+		interps:
+			[
+				{ 
+					keys:[0, 1], 
+					values:[
+						{x : shipHolder.position.x, y : shipHolder.position.y},
+						{x : shipHolder.position.x + 1, y : shipHolder.position.y - 1},
+					],
+					target:shipHolder.position
+				},
+			],
+		loop: false,
+		duration: moveSpeed
+	});
+	move.start();
+}
+
+function moveLeftUp() {
+	let move = new KF.KeyFrameAnimator;
+	move.init({ 
+		interps:
+			[
+				{ 
+					keys:[0, 1], 
+					values:[
+						{x : shipHolder.position.x, y : shipHolder.position.y},
+						{x : shipHolder.position.x - 1, y : shipHolder.position.y + 1},
+					],
+					target:shipHolder.position
+				},
+			],
+		loop: false,
+		duration: moveSpeed
+	});
+	move.start();
+}
+
+function moveLeftDown() {
+	let move = new KF.KeyFrameAnimator;
+	move.init({ 
+		interps:
+			[
+				{ 
+					keys:[0, 1], 
+					values:[
+						{x : shipHolder.position.x, y : shipHolder.position.y},
+						{x : shipHolder.position.x - 1, y : shipHolder.position.y - 1},
+					],
+					target:shipHolder.position
+				},
+			],
+		loop: false,
+		duration: moveSpeed
+	});
+	move.start();
 }
