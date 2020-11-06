@@ -11,17 +11,14 @@ let shipHolder = null;
 function initControls() {
 	document.addEventListener("keydown", (e) => {
 		if(e.key == "d") {
-			shipHolder.position.x += 0.5;
+			moveRight();
 		} else if(e.key == "a") {
-			shipHolder.position.x -= 0.5;
+			moveLeft();
 		}
-	});
-
-	document.addEventListener("keydown", (e) => {
-		if(e.key == "w") {
-			shipHolder.position.y += 0.5;
+		else if(e.key == "w") {
+			moveUp();
 		} else if(e.key == "s") {
-			shipHolder.position.y -= 0.5;
+			moveDown();
 		}
 	});
 }
@@ -50,8 +47,9 @@ async function loadObj(objModelUrl) {
 		object.traverse(function (child) {
 			if (child instanceof THREE.Mesh) {
 				child.material.map = texture;
-				child.scale.set(0.5, 0.5, 0.5);
-				child.rotation.y = -Math.PI/2
+				child.scale.set(0.1, 0.1, 0.1);
+				child.rotation.y = Math.PI/2
+				child.position.y = -8
 			}
 		});
 		shipHolder.add(object);
@@ -67,6 +65,8 @@ function run() {
 	
 	// Render the scene
 	renderer.render(scene, camera);
+
+	KF.update()
 
 	// Update the camera controller
 	orbitControls.update();
@@ -108,4 +108,84 @@ function createScene(canvas) {
 	loadObj(objModelUrl);
 
 	scene.add(shipHolder);
+}
+
+function moveRight() {
+	let moveRightAnimation = new KF.KeyFrameAnimator;
+	moveRightAnimation.init({ 
+		interps:
+			[
+				{ 
+					keys:[0, 1], 
+					values:[
+						{x : shipHolder.position.x},
+						{x : shipHolder.position.x + 1},
+					],
+					target:shipHolder.position
+				},
+			],
+		loop: false,
+		duration: 100
+	});
+	moveRightAnimation.start();
+}
+
+function moveLeft() {
+	let moveLeftAnimation = new KF.KeyFrameAnimator;
+	moveLeftAnimation.init({ 
+		interps:
+			[
+				{ 
+					keys:[0, 1], 
+					values:[
+						{x : shipHolder.position.x},
+						{x : shipHolder.position.x - 1},
+					],
+					target:shipHolder.position
+				},
+			],
+		loop: false,
+		duration: 100
+	});
+	moveLeftAnimation.start();
+}
+
+function moveUp() {
+	let moveUpAnimation = new KF.KeyFrameAnimator;
+	moveUpAnimation.init({ 
+		interps:
+			[
+				{ 
+					keys:[0, 1], 
+					values:[
+						{y : shipHolder.position.y},
+						{y : shipHolder.position.y + 1},
+					],
+					target:shipHolder.position
+				},
+			],
+		loop: false,
+		duration: 100
+	});
+	moveUpAnimation.start();
+}
+
+function moveDown() {
+	let moveDownAnimation = new KF.KeyFrameAnimator;
+	moveDownAnimation.init({ 
+		interps:
+			[
+				{ 
+					keys:[0, 1], 
+					values:[
+						{y : shipHolder.position.y},
+						{y : shipHolder.position.y - 1},
+					],
+					target:shipHolder.position
+				},
+			],
+		loop: false,
+		duration: 100
+	});
+	moveDownAnimation.start();
 }
