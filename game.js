@@ -5,8 +5,12 @@ let orbitControls = null;
 let cube = null;
 
 let objLoader = null;
+
 let objModelUrl = {obj:'../models/pingu.obj', map:'../models/pingu_tex.bmp'};
 let shipHolder = null;
+
+let enemy = null;
+pigUrl = {obj: '../models/pigeon.obj', map : '../models/pigeon_tex.jpg'};
 
 let wKey = false, sKey = false, aKey = false, dKey = false;
 
@@ -61,7 +65,7 @@ function promisifyLoader (loader, onProgress) {
 	};
 }
 
-async function loadObj(objModelUrl) {
+async function loadObj(objModelUrl, holder, scale) {
 	const objPromiseLoader = promisifyLoader(new THREE.OBJLoader());
 
 	try {
@@ -72,13 +76,38 @@ async function loadObj(objModelUrl) {
 		object.traverse(function (child) {
 			if (child instanceof THREE.Mesh) {
 				child.material.map = texture;
-				child.scale.set(0.1, 0.1, 0.1);
+				child.scale.set(scale, scale, scale);
 				child.rotation.y = Math.PI/2
 			}
 		});
 
-		shipHolder.position.y = -8
-		shipHolder.add(object);
+		holder.position.y = -8
+		holder.add(object);
+
+	}
+	catch (err) {
+		return onError(err);
+	}
+}
+
+async function loadEnemy(objModelUrl, holder, scale) {
+	const objPromiseLoader = promisifyLoader(new THREE.OBJLoader());
+
+	try {
+		const object = await objPromiseLoader.load(objModelUrl.obj);
+		
+		let texture = objModelUrl.hasOwnProperty('map') ? new THREE.TextureLoader().load(objModelUrl.map) : null;
+		
+		object.traverse(function (child) {
+			if (child instanceof THREE.Mesh) {
+				child.material.map = texture;
+				child.scale.set(scale, scale, scale);
+				child.rotation.x = Math.PI/2
+			}
+		});
+
+		holder.position.y = 6
+		holder.add(object);
 
 	}
 	catch (err) {
@@ -119,25 +148,28 @@ function createScene(canvas) {
 
 	// Add  a camera so we can view the scene
 	camera = new THREE.PerspectiveCamera(45, canvas.width / canvas.height, 1, 4000);
-	camera.position.set(0, 0, 25);
+	camera.position.set(0, -15, 15);
+	camera.rotation.x = Math.PI/2;
 	scene.add(camera);
 
 	orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
 
 	let directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-	directionalLight.position.set(0, 50, 50)
+	directionalLight.position.set(0, 50, 50);
 	directionalLight.target.position.set(0, 0, 0);
-	scene.add(directionalLight)
+	scene.add(directionalLight);
 
 	let ambientLight = new THREE.AmbientLight (0xffffff, 0.2);
 	scene.add(ambientLight);
 
 	shipHolder = new THREE.Object3D();
-	loadObj(objModelUrl);
+	loadObj(objModelUrl, shipHolder, 0.1);
+
+	enemy = new THREE.Object3D();
+	loadEnemy(pigUrl, enemy, 0.25)
 
 	scene.add(shipHolder);
-
-	console.log(shipHolder);
+	scene.add(enemy);
 }
 
 function animate() {
@@ -164,19 +196,19 @@ function animate() {
 		}
 	} else if(dKey) {
 		if(shipHolder.position.x < 19) {
-			moveRight()
+			moveRight();
 		}
 	} else if(aKey) {
 		if(shipHolder.position.x > -19) {
-			moveLeft()
+			moveLeft();
 		}
 	} else if(wKey) {
 		if(shipHolder.position.y < 7) {
-			moveUp()
+			moveUp();
 		}
 	} else if(sKey) {
 		if(shipHolder.position.y > -9) {
-			moveDown()
+			moveDown();
 		}
 	}
 
