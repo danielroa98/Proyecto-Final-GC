@@ -12,6 +12,10 @@ let wKey = false, sKey = false, aKey = false, dKey = false;
 
 let moveSpeed = 33;
 
+let projectilesCounter = [];
+
+let currentTime = Date.now()
+
 function initControls() {
 	document.addEventListener("keydown", (e) => {
 		if(e.key == "d") {
@@ -34,6 +38,12 @@ function initControls() {
 			wKey = false;
 		} else if(e.key == "s") {
 			sKey = false;
+		}
+	});
+
+	document.addEventListener("keypress", (e) => {
+		if(e.key == " ") {
+			shoot();
 		}
 	});
 }
@@ -64,9 +74,10 @@ async function loadObj(objModelUrl) {
 				child.material.map = texture;
 				child.scale.set(0.1, 0.1, 0.1);
 				child.rotation.y = Math.PI/2
-				child.position.y = -8
 			}
 		});
+
+		shipHolder.position.y = -8
 		shipHolder.add(object);
 
 	}
@@ -125,23 +136,30 @@ function createScene(canvas) {
 	loadObj(objModelUrl);
 
 	scene.add(shipHolder);
+
+	console.log(shipHolder);
 }
 
 function animate() {
+	let now = Date.now();
+    let deltat = now - currentTime;
+    currentTime = now;
+    let fract = deltat / 50;
+
 	if(dKey && wKey) {
-		if(shipHolder.position.x < 19 && shipHolder.position.y < 15) {
+		if(shipHolder.position.x < 19 && shipHolder.position.y < 7) {
 			moveRightUp();
 		}
 	} else if (dKey && sKey) {
-		if(shipHolder.position.x < 19 && shipHolder.position.y > -1) {
+		if(shipHolder.position.x < 19 && shipHolder.position.y > -9) {
 			moveRightDown();
 		}
 	} else if (aKey && wKey) {
-		if(shipHolder.position.x > -19 && shipHolder.position.y < 15) {
+		if(shipHolder.position.x > -19 && shipHolder.position.y < 7) {
 			moveLeftUp();
 		}
 	} else if (aKey && sKey) {
-		if(shipHolder.position.x > -19 && shipHolder.position.y > -1) {
+		if(shipHolder.position.x > -19 && shipHolder.position.y > -9) {
 			moveLeftDown();
 		}
 	} else if(dKey) {
@@ -153,14 +171,22 @@ function animate() {
 			moveLeft()
 		}
 	} else if(wKey) {
-		if(shipHolder.position.y < 15) {
+		if(shipHolder.position.y < 7) {
 			moveUp()
 		}
 	} else if(sKey) {
-		if(shipHolder.position.y > -1) {
+		if(shipHolder.position.y > -9) {
 			moveDown()
 		}
 	}
+
+	projectilesCounter.forEach((proj) => {
+		if(Date.now() - proj.life > 1000) {
+			scene.remove(proj.obj);
+		}
+
+		proj.obj.position.y += fract 
+	})
 }
 
 function moveRight() {
@@ -321,4 +347,15 @@ function moveLeftDown() {
 		duration: moveSpeed
 	});
 	move.start();
+}
+
+function shoot() {
+	let geometry = new THREE.SphereGeometry(0.1, 32, 32);
+	let material = new THREE.MeshBasicMaterial({color: "red"});
+
+	let projectile = new THREE.Mesh(geometry, material);
+
+	projectile.position.set(shipHolder.position.x, shipHolder.position.y, 0);
+	projectilesCounter.push({obj: projectile, life: Date.now()});
+	scene.add(projectile);
 }
