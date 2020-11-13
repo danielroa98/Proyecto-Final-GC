@@ -14,6 +14,36 @@
 
 <script src="game.js"></script>
 
+<script id="fragmentShader" type="x-shader/x-fragment">
+	uniform float time;
+	uniform sampler2D noiseTexture;
+	uniform sampler2D glowTexture;
+	varying vec2 texCoord;
+
+	void main( void ) {
+		vec4 noise = texture2D( noiseTexture, texCoord );
+		vec2 translation = texCoord + vec2( -1, 1 ) * time * 0.2; 
+		
+		translation.x += noise.b;
+		translation.y -= noise.g;
+		
+		vec4 color = texture2D( glowTexture, translation );
+		vec4 newColor = vec4(color.r, color.g, color.b, 0.6);
+		
+		gl_FragColor = newColor;
+	}
+</script>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+	varying vec2 texCoord;
+
+	void main() {
+		texCoord = uv;
+		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+	}
+</script>
+
 <script type="text/javascript">
 	$(document).ready(() => {		
 		let canvas = document.getElementById("webglcanvas");

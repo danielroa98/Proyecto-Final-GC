@@ -4,6 +4,10 @@ let camera = null;
 let orbitControls = null;
 let cube = null;
 
+let materials = null;
+
+let floorUniforms = null;
+
 let objLoader = null;
 
 let objModelUrl = {obj:'../models/pingu.obj', map:'../models/pingu_tex.bmp'};
@@ -63,6 +67,30 @@ function promisifyLoader (loader, onProgress) {
 	  originalLoader: loader,
 	  load: promiseLoader,
 	};
+}
+
+function loadMaterials() {
+	let walls =  new THREE.TextureLoader().load("./img/spacewall.jpg")
+	let floor = new THREE.TextureLoader().load("./img/spacefloor.jpg")
+
+	floorUniforms = {
+        time: {type: "f", value: 0.2},
+        glowTexture: {type: "t", value: walls}
+    };
+	floorUniforms.glowTexture.value.wrapS = floorUniforms.glowTexture.value.wrapT = THREE.RepeatWrapping;
+
+	materials = {
+		walls: new THREE.ShaderMaterial({
+			uniforms: floorUniforms,
+			vertexShader: document.getElementById('vertexShader').textContent,
+			fragmentShader: document.getElementById('fragmentShader').textContent
+		}),
+		floor: new THREE.ShaderMaterial({
+			uniforms: floorUniforms,
+			vertexShader: document.getElementById('vertexShader').textContent,
+			fragmentShader: document.getElementById('fragmentShader').textContent
+		})
+	}
 }
 
 async function loadObj(objModelUrl, holder, scale) {
@@ -140,11 +168,12 @@ function createScene(canvas) {
 	renderer.shadowMap.enabled = true;
 	// Options are THREE.BasicShadowMap, THREE.PCFShadowMap, PCFSoftShadowMap
 	renderer.shadowMap.type = THREE.BasicShadowMap;
+
+	loadMaterials();
 	
 	// Create a new Three.js scene
 	scene = new THREE.Scene();
-	let sceneBackgound = new THREE.TextureLoader().load("./img/field.jpg")
-	scene.background = sceneBackgound;
+	scene.background = new THREE.Color('black');
 
 	// Add  a camera so we can view the scene
 	camera = new THREE.PerspectiveCamera(45, canvas.width / canvas.height, 1, 4000);
@@ -159,7 +188,7 @@ function createScene(canvas) {
 	directionalLight.target.position.set(0, 0, 0);
 	scene.add(directionalLight);
 
-	let ambientLight = new THREE.AmbientLight (0xffffff, 0.2);
+	let ambientLight = new THREE.AmbientLight (0xffffff, 0.6);
 	scene.add(ambientLight);
 
 	shipHolder = new THREE.Object3D();
@@ -170,6 +199,18 @@ function createScene(canvas) {
 
 	scene.add(shipHolder);
 	scene.add(enemy);
+
+	let border1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 50, 20), materials.walls);
+	border1.position.x = -14.5;
+	scene.add(border1);
+
+	let border2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 50, 20), materials.walls);
+	border2.position.x = 14.5;
+	scene.add(border2);
+
+	let floor = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), materials.floor);
+	floor.position.z = -5
+	scene.add(floor);
 }
 
 function animate() {
@@ -179,27 +220,27 @@ function animate() {
     let fract = deltat / 50;
 
 	if(dKey && wKey) {
-		if(shipHolder.position.x < 19 && shipHolder.position.y < 7) {
+		if(shipHolder.position.x < 12 && shipHolder.position.y < 7) {
 			moveRightUp();
 		}
 	} else if (dKey && sKey) {
-		if(shipHolder.position.x < 19 && shipHolder.position.y > -9) {
+		if(shipHolder.position.x < 12 && shipHolder.position.y > -9) {
 			moveRightDown();
 		}
 	} else if (aKey && wKey) {
-		if(shipHolder.position.x > -19 && shipHolder.position.y < 7) {
+		if(shipHolder.position.x > -12 && shipHolder.position.y < 7) {
 			moveLeftUp();
 		}
 	} else if (aKey && sKey) {
-		if(shipHolder.position.x > -19 && shipHolder.position.y > -9) {
+		if(shipHolder.position.x > -12 && shipHolder.position.y > -9) {
 			moveLeftDown();
 		}
 	} else if(dKey) {
-		if(shipHolder.position.x < 19) {
+		if(shipHolder.position.x < 12) {
 			moveRight();
 		}
 	} else if(aKey) {
-		if(shipHolder.position.x > -19) {
+		if(shipHolder.position.x > -12) {
 			moveLeft();
 		}
 	} else if(wKey) {
@@ -217,8 +258,10 @@ function animate() {
 			scene.remove(proj.obj);
 		}
 
-		proj.obj.position.y += fract 
-	})
+		proj.obj.position.y += fract*3 
+	});
+
+	floorUniforms.time.value += fract/20;
 }
 
 function moveRight() {
