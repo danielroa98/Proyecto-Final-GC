@@ -93,7 +93,7 @@ function loadMaterials() {
 	}
 }
 
-async function loadObj(objModelUrl, holder, scale) {
+async function loadObj(objModelUrl, holder, scale, yPos, xRot, yRot) {
 	const objPromiseLoader = promisifyLoader(new THREE.OBJLoader());
 
 	try {
@@ -105,11 +105,12 @@ async function loadObj(objModelUrl, holder, scale) {
 			if (child instanceof THREE.Mesh) {
 				child.material.map = texture;
 				child.scale.set(scale, scale, scale);
-				child.rotation.y = Math.PI/2
+				child.rotation.x = xRot;
+				child.rotation.y = yRot;
 			}
 		});
 
-		holder.position.y = -8
+		holder.position.y = yPos
 		holder.add(object);
 
 	}
@@ -118,30 +119,6 @@ async function loadObj(objModelUrl, holder, scale) {
 	}
 }
 
-async function loadEnemy(objModelUrl, holder, scale) {
-	const objPromiseLoader = promisifyLoader(new THREE.OBJLoader());
-
-	try {
-		const object = await objPromiseLoader.load(objModelUrl.obj);
-		
-		let texture = objModelUrl.hasOwnProperty('map') ? new THREE.TextureLoader().load(objModelUrl.map) : null;
-		
-		object.traverse(function (child) {
-			if (child instanceof THREE.Mesh) {
-				child.material.map = texture;
-				child.scale.set(scale, scale, scale);
-				child.rotation.x = Math.PI/2
-			}
-		});
-
-		holder.position.y = 6
-		holder.add(object);
-
-	}
-	catch (err) {
-		return onError(err);
-	}
-}
 
 function run() {
 	requestAnimationFrame(() => {run();});
@@ -192,10 +169,10 @@ function createScene(canvas) {
 	scene.add(ambientLight);
 
 	shipHolder = new THREE.Object3D();
-	loadObj(objModelUrl, shipHolder, 0.1);
+	loadObj(objModelUrl, shipHolder, 0.1, -8, 0,Math.PI/2);
 
 	enemy = new THREE.Object3D();
-	loadEnemy(pigUrl, enemy, 0.25)
+	loadObj(pigUrl, enemy, 0.25, 6, Math.PI/2, 0)
 
 	scene.add(shipHolder);
 	scene.add(enemy);
