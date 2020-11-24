@@ -128,7 +128,6 @@ async function loadObj(objModelUrl, holder, scale, yPos, xRot, yRot) {
 	}
 }
 
-/*
 function loadObjWithMtl(objChickenGun, mtlChickenGun) {
 	mtlLoader = new THREE.MTLLoader();
 
@@ -156,7 +155,6 @@ function loadObjWithMtl(objChickenGun, mtlChickenGun) {
 		});
 	});
 }
-*/
 
 function run() {
 	requestAnimationFrame(() => {run();});
