@@ -24,6 +24,14 @@ let projectilesCounter = [];
 
 let currentTime = Date.now()
 
+//Load chicken with gun .obj and .mtl
+let objChickenGun = "../models/Chickens/chicken_w_gun.obj";
+let mtlChickenGun = "../models/Chickens/chicken_w_gun.mtl";
+
+//Load chicken with knife .obj and .mtl
+let objChickenKnife = "../models/Chickens/chicken_w_knife.obj";
+let mtlChickenKnife = "../models/Chickens/chicken_w_knife.mtl";
+
 function initControls() {
 	document.addEventListener("keydown", (e) => {
 		if(e.key == "d") {
@@ -119,6 +127,33 @@ async function loadObj(objModelUrl, holder, scale, yPos, xRot, yRot) {
 	}
 }
 
+function loadObjWithMtl(objChickenGun, mtlChickenGun) {
+	mtlLoader = new THREE.MTLLoader();
+
+	mtlLoader.load(mtlModelUrl, materials => {
+
+		materials.preload();
+		console.log(materials);
+
+		objLoader = new THREE.OBJLoader();
+
+		objLoader.setMaterials(materials);
+
+		objLoader.load(objModelUrl, object => {
+			object.traverse(function (child) {
+				if (child.isMesh) {
+					child.geometry.computeVertexNormals();
+					// child.geometry.computeBoundingBox();
+				}
+			});
+
+			objectList.push(object);
+			object.position.y -= 3;
+			object.scale.set(2.5, 2.5, 2.5);
+			scene.add(object);
+		});
+	});
+}
 
 function run() {
 	requestAnimationFrame(() => {run();});
