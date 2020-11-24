@@ -21,7 +21,7 @@
 	varying vec2 texCoord;
 
 	void main( void ) {
-		vec2 translation = (texCoord * 10.0) + vec2( 0, 1 ) * time; 
+		vec2 translation = (texCoord * 10.0) + vec2( 0.1, 1 ) * time; 
 
 		
 		vec4 color = texture2D( glowTexture, translation );
