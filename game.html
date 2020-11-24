@@ -21,11 +21,8 @@
 	varying vec2 texCoord;
 
 	void main( void ) {
-		vec4 noise = texture2D( noiseTexture, texCoord );
-		vec2 translation = texCoord + vec2( -1, 1 ) * time * 0.2; 
-		
-		translation.x += noise.b;
-		translation.y -= noise.g;
+		vec2 translation = (texCoord * 10.0) + vec2( 0, 1 ) * time; 
+
 		
 		vec4 color = texture2D( glowTexture, translation );
 		vec4 newColor = vec4(color.r, color.g, color.b, 0.6);

@@ -78,12 +78,11 @@ function promisifyLoader (loader, onProgress) {
 }
 
 function loadMaterials() {
-	let walls =  new THREE.TextureLoader().load("./img/spacewall.jpg")
-	let floor = new THREE.TextureLoader().load("./img/spacefloor.jpg")
+	let spaceTexture =  new THREE.TextureLoader().load("./img/spaaaace.jpeg");
 
 	floorUniforms = {
         time: {type: "f", value: 0.2},
-        glowTexture: {type: "t", value: walls}
+        glowTexture: {type: "t", value: spaceTexture}
     };
 	floorUniforms.glowTexture.value.wrapS = floorUniforms.glowTexture.value.wrapT = THREE.RepeatWrapping;
 
@@ -91,12 +90,14 @@ function loadMaterials() {
 		walls: new THREE.ShaderMaterial({
 			uniforms: floorUniforms,
 			vertexShader: document.getElementById('vertexShader').textContent,
-			fragmentShader: document.getElementById('fragmentShader').textContent
+			fragmentShader: document.getElementById('fragmentShader').textContent,
+			side: THREE.DoubleSide
 		}),
 		floor: new THREE.ShaderMaterial({
 			uniforms: floorUniforms,
 			vertexShader: document.getElementById('vertexShader').textContent,
-			fragmentShader: document.getElementById('fragmentShader').textContent
+			fragmentShader: document.getElementById('fragmentShader').textContent,
+			side: THREE.DoubleSide
 		})
 	}
 }
@@ -127,6 +128,7 @@ async function loadObj(objModelUrl, holder, scale, yPos, xRot, yRot) {
 	}
 }
 
+/*
 function loadObjWithMtl(objChickenGun, mtlChickenGun) {
 	mtlLoader = new THREE.MTLLoader();
 
@@ -154,6 +156,7 @@ function loadObjWithMtl(objChickenGun, mtlChickenGun) {
 		});
 	});
 }
+*/
 
 function run() {
 	requestAnimationFrame(() => {run();});
@@ -212,17 +215,11 @@ function createScene(canvas) {
 	scene.add(shipHolder);
 	scene.add(enemy);
 
-	let border1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 50, 20), materials.walls);
-	border1.position.x = -14.5;
-	scene.add(border1);
-
-	let border2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 50, 20), materials.walls);
-	border2.position.x = 14.5;
-	scene.add(border2);
-
-	let floor = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), materials.floor);
-	floor.position.z = -5
-	scene.add(floor);
+	let spaceGeometry = new THREE.CylinderGeometry(20, 20, 100, 30, 1, true, 0, 4);
+	let space = new THREE.Mesh(spaceGeometry, materials.walls);
+	space.rotation.y = Math.PI/3
+	space.position.y = 20;
+	scene.add(space);
 }
 
 function animate() {
@@ -273,7 +270,7 @@ function animate() {
 		proj.obj.position.y += fract*3 
 	});
 
-	floorUniforms.time.value += fract/20;
+	floorUniforms.time.value += fract/10;
 }
 
 function moveRight() {
