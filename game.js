@@ -22,7 +22,7 @@ let moveSpeed = 33;
 
 let projectilesCounter = [];
 
-let currentTime = Date.now()
+let currentTime = Date.now();
 
 //Load chicken with gun .obj and .mtl
 let objChickenGun = "../models/Chickens/chicken_w_gun.obj";
@@ -31,6 +31,12 @@ let mtlChickenGun = "../models/Chickens/chicken_w_gun.mtl";
 //Load chicken with knife .obj and .mtl
 let objChickenKnife = "../models/Chickens/chicken_w_knife.obj";
 let mtlChickenKnife = "../models/Chickens/chicken_w_knife.mtl";
+
+//Enemy models
+enemyModels = [
+	{modelo: objChickenGun, textura: mtlChickenGun}, 
+	{modelo: objChickenKnife, textura: mtlChickenKnife}
+];
 
 function initControls() {
 	document.addEventListener("keydown", (e) => {
@@ -102,6 +108,7 @@ function loadMaterials() {
 	}
 }
 
+//	loadObj(pigUrl, enemy, 0.25, 6, Math.PI/2, 0)
 async function loadObj(objModelUrl, holder, scale, yPos, xRot, yRot) {
 	const objPromiseLoader = promisifyLoader(new THREE.OBJLoader());
 
@@ -128,10 +135,17 @@ async function loadObj(objModelUrl, holder, scale, yPos, xRot, yRot) {
 	}
 }
 
-function loadObjWithMtl(objChickenGun, mtlChickenGun) {
+function loadObjWithMtl(enemyModels, enemyType) {
 	mtlLoader = new THREE.MTLLoader();
 
-	mtlLoader.load(mtlModelUrl, materials => {
+	let enemyModelUrl = enemyModels[enemyType].modelo;
+	let mtlModelEnemy = enemyModels[enemyType].textura;
+
+	console.log(loadedEnemy);
+	console.log(enemyModelUrl);
+	console.log(mtlModelEnemy);
+
+	mtlLoader.load(mtlModelEnemy, materials => {
 
 		materials.preload();
 		console.log(materials);
@@ -140,7 +154,7 @@ function loadObjWithMtl(objChickenGun, mtlChickenGun) {
 
 		objLoader.setMaterials(materials);
 
-		objLoader.load(objModelUrl, object => {
+		objLoader.load(enemyModelUrl, object => {
 			object.traverse(function (child) {
 				if (child.isMesh) {
 					child.geometry.computeVertexNormals();
@@ -149,7 +163,7 @@ function loadObjWithMtl(objChickenGun, mtlChickenGun) {
 			});
 
 			objectList.push(object);
-			object.position.y -= 3;
+			object.position.y = 6;
 			object.scale.set(2.5, 2.5, 2.5);
 			scene.add(object);
 		});
@@ -210,6 +224,9 @@ function createScene(canvas) {
 	enemy = new THREE.Object3D();
 	loadObj(pigUrl, enemy, 0.25, 6, Math.PI/2, 0)
 
+	let enemyType = Math.floor((Math.random() * 2) + 0);
+	loadObjWithMtl(enemyModels, enemyType);
+
 	scene.add(shipHolder);
 	scene.add(enemy);
 
@@ -218,6 +235,15 @@ function createScene(canvas) {
 	space.rotation.y = Math.PI/3
 	space.position.y = 20;
 	scene.add(space);
+
+	let loadedEnemy = Math.floor((Math.random() * 2) + 0);
+
+	let enemyModelUrl = enemyModels[loadedEnemy].modelo;
+	let mtlModelEnemy = enemyModels[loadedEnemy].textura;
+
+	console.log(loadedEnemy);
+	console.log(enemyModelUrl);
+	console.log(mtlModelEnemy);
 }
 
 function animate() {
@@ -440,4 +466,8 @@ function shoot() {
 	projectile.position.set(shipHolder.position.x, shipHolder.position.y, 0);
 	projectilesCounter.push({obj: projectile, life: Date.now()});
 	scene.add(projectile);
+}
+
+function shootWaifu(){
+
 }
