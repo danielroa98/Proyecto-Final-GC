@@ -114,7 +114,7 @@ function loadMaterials() {
 }
 
 //	loadObj(pigUrl, enemy, 0.25, 6, Math.PI/2, 0)
-async function loadObj(objModelUrl, holder, scale, yPos, xPos, xRot, yRot) {
+async function loadObj(objModelUrl, holder, scale, zPos, yPos, xPos, xRot, yRot) {
 	const objPromiseLoader = promisifyLoader(new THREE.OBJLoader());
 
 	try {
@@ -131,6 +131,8 @@ async function loadObj(objModelUrl, holder, scale, yPos, xPos, xRot, yRot) {
 			}
 		});
 
+
+		holder.position.z = zPos;
 		holder.position.y = yPos;
 		holder.position.x = xPos;
 		holder.add(object);
@@ -225,7 +227,7 @@ function createScene(canvas) {
 	scene.add(ambientLight);
 
 	shipHolder = new THREE.Object3D();
-	loadObj(objModelUrl, shipHolder, 0.1, -8, 0, 0,Math.PI/2);
+	loadObj(objModelUrl, shipHolder, 0.1, 0.75, -8, 0, 0,Math.PI/2);
 
 	enemy = new THREE.Object3D();
 	
@@ -234,7 +236,7 @@ function createScene(canvas) {
 
 		let enemyPos = (Math.random() * (-5)) + 5;
 
-		loadObj(pigUrl, temp, 0.25, 8, i, Math.PI / 2, 0);
+		loadObj(pigUrl, temp, 0.25, 0.55, 8, i, Math.PI / 2, 0);
 
 		console.log(enemyPos);
 
@@ -250,7 +252,7 @@ function createScene(canvas) {
 		
 		let enemyPos = (Math.random()*(-5)) + 5;
 
-		loadObj(pigUrl, temp, 0.25, 7, i, Math.PI/2, 0);
+		loadObj(pigUrl, temp, 0.25, 0.55, 7, i, Math.PI/2, 0);
 	
 		console.log(enemyPos);
 
@@ -266,7 +268,7 @@ function createScene(canvas) {
 
 		let enemyPos = (Math.random() * (-5)) + 5;
 
-		loadObj(pigUrl, temp, 0.25, 6, i, Math.PI / 2, 0);
+		loadObj(pigUrl, temp, 0.25, 0.55, 6, i, Math.PI / 2, 0);
 
 		console.log(enemyPos);
 
@@ -298,15 +300,27 @@ function createScene(canvas) {
 	console.log(enemyModelUrl);
 	console.log(mtlModelEnemy); */
 
+	//Icon
+	var heart = document.createElement('div');
+	heart.style.position = 'absolute';
+	heart.style.width = 100;
+	heart.style.height = 100;
+	heart.innerHTML = "♡";
+	heart.style.top = 7.5 + 'px';
+	heart.style.left = 50 + 'px';
+	heart.style.fontSize = 100 + 'px';
+	heart.style.color = '#fc3003';
+	document.body.insertBefore(heart, text2);
+
 	//Vida
 	var text2 = document.createElement('div');
 	text2.style.position = 'absolute';
 	//text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
 	text2.style.width = 100;
 	text2.style.height = 100;
-	text2.innerHTML = "♡"+ 100 ;
+	text2.innerHTML = 100;
 	text2.style.top = 20 + 'px';
-	text2.style.left = 50 + 'px';
+	text2.style.left = 110 + 'px';
 	text2.style.fontSize = 100+'px';
 	text2.style.color= '#fc3003';
 	text2.id = "vida";
@@ -319,10 +333,10 @@ function animate() {
     currentTime = now;
 	let fract = deltat / 50;
 
-	/*
-	let vidaText = document.getElementById("vida");
-	vidaText.innerHTML = vida;
-	*/
+	
+	/* let vidaText = document.getElementById("vida");
+	vidaText.innerHTML = vida; */
+	
 
 	if(dKey && wKey) {
 		if(shipHolder.position.x < 12 && shipHolder.position.y < 7) {
