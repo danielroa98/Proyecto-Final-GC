@@ -319,10 +319,10 @@ function animate() {
     currentTime = now;
 	let fract = deltat / 50;
 
-	
+	/*
 	let vidaText = document.getElementById("vida");
 	vidaText.innerHTML = vida;
-	
+	*/
 
 	if(dKey && wKey) {
 		if(shipHolder.position.x < 12 && shipHolder.position.y < 7) {
@@ -358,11 +358,22 @@ function animate() {
 		}
 	}
 
-	projectilesCounter.forEach((proj) => {
+	projectilesCounter.forEach((proj, index, array) => {
 		if(Date.now() - proj.life > 1000) {
 			scene.remove(proj.obj);
+			array.splice(index, 1);
 		}
-
+		//Calculo de colision con las palomas
+		batallions.forEach((paloma, index2, array2) =>{
+			//Ver boundries
+			if(proj.obj.position.x <= (paloma.position.x + 0.3)
+			&& proj.obj.position.x >= (paloma.position.x - 0.3)
+			&& proj.obj.position.y <= (paloma.position.y + 0.3)
+			&& proj.obj.position.y >= (paloma.position.y - 0.3)){
+				console.log("Le di a paloma "+index2);
+				scene.remove(paloma);
+			}
+		})
 		proj.obj.position.y += fract*3 
 	});
 
@@ -370,18 +381,6 @@ function animate() {
 		const element = batallions[x];
 
 		let upPosition = 0.05;
-		//console.log(element.position.x);
-
-		/*
-		if( element.position.x < 12){
-			element.position.x += upPosition;
-		}
-
-		else if( element.position.x > -12){
-			element.position.x -= upPosition;
-		}
-		*/
-
 		if(element.posBool == false){
 			element.position.x -= upPosition;
 		}
@@ -389,43 +388,15 @@ function animate() {
 			element.position.x += upPosition;
 		}
 
-		if( element.position.x <= -12){
+		if( element.position.x <= -13){
 			element.posBool = true;
+			element.position.y -= 1;
 		}
-		else if (element.position.x >= 12){
+		else if (element.position.x >= 13){
 			element.posBool = false;
+			element.position.y -= 1;
 		}
 
-	}
-
-	for (let y = 0; y < batallions.length; y++) {
-		const flock = batallions[y];
-		
-		let lowerPosition = 0.00501;
-
-		//console.log("Outside the for" + flock.position.y);
-
-		if (flock.posBoolY == true) {
-			flock.position.y -= lowerPosition;
-
-			//console.log("Update en el if booleano" + flock.position.y);
-			if(flock.position.y == 0){
-				vida = 0;
-				console.log(vida);
-			}
-		}
-
-		if(flock.position.y <= 8){
-			//console.log("Update en el if para descender " + flock.position.y);
-
-			flock.posBoolY = true;
-		
-		}else if(flock.position.y == 0){
-			console.log(flock.position.y);
-			vida = 0;
-
-			flock.posBoolY = false;
-		}
 	}
 	//console.log(vida);
 
@@ -593,7 +564,7 @@ function moveLeftDown() {
 }
 
 function shoot() {
-	let geometry = new THREE.SphereGeometry(0.1, 32, 32);
+	let geometry = new THREE.SphereGeometry(0.2, 32, 32);
 	let material = new THREE.MeshBasicMaterial({color: "red"});
 
 	let projectile = new THREE.Mesh(geometry, material);
@@ -601,6 +572,7 @@ function shoot() {
 	projectile.position.set(shipHolder.position.x, shipHolder.position.y, 0);
 	projectilesCounter.push({obj: projectile, life: Date.now()});
 	scene.add(projectile);
+	console.log(projectilesCounter);
 }
 
 function shootWaifu(){
