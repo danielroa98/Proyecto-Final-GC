@@ -11,7 +11,7 @@ let materials = null;
 
 let floorUniforms = null;
 
-let objLoader = null;
+let objLoader = null, mtlLoader = null;
 
 let objModelUrl = {obj:'../models/pingu.obj', map:'../models/pingu_tex.bmp'};
 let shipHolder = null;
@@ -26,6 +26,8 @@ let moveSpeed = 33;
 let projectilesCounter = [];
 
 let currentTime = Date.now();
+
+let batallions = [];
 
 //Load chicken with gun .obj and .mtl
 let objChickenGun = "../models/Chickens/chicken_w_gun.obj";
@@ -112,7 +114,7 @@ function loadMaterials() {
 }
 
 //	loadObj(pigUrl, enemy, 0.25, 6, Math.PI/2, 0)
-async function loadObj(objModelUrl, holder, scale, yPos, xRot, yRot) {
+async function loadObj(objModelUrl, holder, scale, yPos, xPos, xRot, yRot) {
 	const objPromiseLoader = promisifyLoader(new THREE.OBJLoader());
 
 	try {
@@ -129,7 +131,8 @@ async function loadObj(objModelUrl, holder, scale, yPos, xRot, yRot) {
 			}
 		});
 
-		holder.position.y = yPos
+		holder.position.y = yPos;
+		holder.position.x = xPos;
 		holder.add(object);
 
 	}
@@ -222,13 +225,30 @@ function createScene(canvas) {
 	scene.add(ambientLight);
 
 	shipHolder = new THREE.Object3D();
-	loadObj(objModelUrl, shipHolder, 0.1, -8, 0,Math.PI/2);
+	loadObj(objModelUrl, shipHolder, 0.1, -8, 0, 0,Math.PI/2);
 
 	enemy = new THREE.Object3D();
-	loadObj(pigUrl, enemy, 0.25, 6, Math.PI/2, 0)
+	
+	for (let i = 0; i < 5; i++) {
+		let temp = new THREE.Object3D();
+		
+		let enemyPos = (Math.random()* + (4)) + 8;
+
+		loadObj(pigUrl, temp, 0.25, enemyPos, enemyPos, Math.PI/2, 0);
+	
+		console.log(enemyPos);
+
+		scene.add(temp);
+		temp.posBool = false;
+		batallions.push(temp);
+
+	}
+	console.log(batallions);
+
+	/* let enemyType = Math.floor((Math.random() * 2) + 0);
+	loadObjWithMtl(enemyModels, enemyType); */
 
 	scene.add(shipHolder);
-	scene.add(enemy);
 
 	let spaceGeometry = new THREE.CylinderGeometry(20, 20, 100, 30, 1, true, 0, 4);
 	let space = new THREE.Mesh(spaceGeometry, materials.walls);
@@ -314,6 +334,40 @@ function animate() {
 
 		proj.obj.position.y += fract*3 
 	});
+
+	for (let x = 0; x < batallions.length; x++) {
+		const element = batallions[x];
+
+		let upPosition = 0.05;
+
+
+		//console.log(element.position.x);
+
+		/*
+		if( element.position.x < 12){
+			element.position.x += upPosition;
+		}
+
+		else if( element.position.x > -12){
+			element.position.x -= upPosition;
+		}
+		*/
+
+		if(element.posBool == false){
+			element.position.x -= upPosition;
+		}
+		else if(element.posBool == true){
+			element.position.x += upPosition;
+		}
+
+		if( element.position.x <= -12){
+			element.posBool = true;
+		}
+		else if (element.position.x >= 12){
+			element.posBool = false;
+		}
+
+	}
 
 	floorUniforms.time.value += fract/10;
 }
