@@ -320,8 +320,8 @@ function animate() {
 	let fract = deltat / 50;
 
 	
-	let vidaText = document.getElementById("vida");
-	vidaText.innerHTML = vida;
+	/* let vidaText = document.getElementById("vida");
+	vidaText.innerHTML = vida; */
 	
 
 	if(dKey && wKey) {
