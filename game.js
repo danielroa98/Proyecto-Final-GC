@@ -1,3 +1,6 @@
+//import {MTLLoader} from 'three-mtl-loader';
+//const MTTLoader = require('three-mtl-loader');
+
 let renderer = null;
 let scene = null;
 let camera = null;
@@ -224,9 +227,6 @@ function createScene(canvas) {
 	enemy = new THREE.Object3D();
 	loadObj(pigUrl, enemy, 0.25, 6, Math.PI/2, 0)
 
-	let enemyType = Math.floor((Math.random() * 2) + 0);
-	loadObjWithMtl(enemyModels, enemyType);
-
 	scene.add(shipHolder);
 	scene.add(enemy);
 
@@ -244,13 +244,34 @@ function createScene(canvas) {
 	console.log(loadedEnemy);
 	console.log(enemyModelUrl);
 	console.log(mtlModelEnemy);
+
+	//Vida
+	var text2 = document.createElement('div');
+	text2.style.position = 'absolute';
+	//text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
+	text2.style.width = 100;
+	text2.style.height = 100;
+	text2.innerHTML = "♡"+ 100 ;
+	text2.style.top = 20 + 'px';
+	text2.style.left = 50 + 'px';
+	text2.style.fontSize = 100+'px';
+	text2.style.color= '#fc3003';
+	text2.id = "vida";
+	document.body.appendChild(text2);
 }
 
+let vida = 0;
 function animate() {
 	let now = Date.now();
     let deltat = now - currentTime;
     currentTime = now;
-    let fract = deltat / 50;
+	let fract = deltat / 50;
+	vida += 1;
+
+	/*
+	let vidaText = document.getElementById("vida");
+	vidaText.innerHTML = vida;
+	*/
 
 	if(dKey && wKey) {
 		if(shipHolder.position.x < 12 && shipHolder.position.y < 7) {
