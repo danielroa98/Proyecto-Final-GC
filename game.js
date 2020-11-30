@@ -229,17 +229,50 @@ function createScene(canvas) {
 
 	enemy = new THREE.Object3D();
 	
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < 10; i++) {
+		let temp = new THREE.Object3D();
+
+		let enemyPos = (Math.random() * (-5)) + 5;
+
+		loadObj(pigUrl, temp, 0.25, 8, i, Math.PI / 2, 0);
+
+		console.log(enemyPos);
+
+		scene.add(temp);
+		temp.posBool = false;
+		temp.posBoolY = false;
+		batallions.push(temp);
+
+	}
+
+	for (let i = 0; i < 10; i++) {
 		let temp = new THREE.Object3D();
 		
-		let enemyPos = (Math.random()* + (4)) + 8;
+		let enemyPos = (Math.random()*(-5)) + 5;
 
-		loadObj(pigUrl, temp, 0.25, enemyPos, enemyPos, Math.PI/2, 0);
+		loadObj(pigUrl, temp, 0.25, 7, i, Math.PI/2, 0);
 	
 		console.log(enemyPos);
 
 		scene.add(temp);
 		temp.posBool = false;
+		temp.posBoolY = false;
+		batallions.push(temp);
+
+	}
+
+	for (let i = 0; i < 10; i++) {
+		let temp = new THREE.Object3D();
+
+		let enemyPos = (Math.random() * (-5)) + 5;
+
+		loadObj(pigUrl, temp, 0.25, 6, i, Math.PI / 2, 0);
+
+		console.log(enemyPos);
+
+		scene.add(temp);
+		temp.posBool = false;
+		temp.posBoolY = false;
 		batallions.push(temp);
 
 	}
@@ -261,9 +294,9 @@ function createScene(canvas) {
 	let enemyModelUrl = enemyModels[loadedEnemy].modelo;
 	let mtlModelEnemy = enemyModels[loadedEnemy].textura;
 
-	console.log(loadedEnemy);
+	/* console.log(loadedEnemy);
 	console.log(enemyModelUrl);
-	console.log(mtlModelEnemy);
+	console.log(mtlModelEnemy); */
 
 	//Vida
 	var text2 = document.createElement('div');
@@ -280,18 +313,16 @@ function createScene(canvas) {
 	document.body.appendChild(text2);
 }
 
-let vida = 0;
 function animate() {
 	let now = Date.now();
     let deltat = now - currentTime;
     currentTime = now;
 	let fract = deltat / 50;
-	vida += 1;
 
-	/*
+	
 	let vidaText = document.getElementById("vida");
 	vidaText.innerHTML = vida;
-	*/
+	
 
 	if(dKey && wKey) {
 		if(shipHolder.position.x < 12 && shipHolder.position.y < 7) {
@@ -339,8 +370,6 @@ function animate() {
 		const element = batallions[x];
 
 		let upPosition = 0.05;
-
-
 		//console.log(element.position.x);
 
 		/*
@@ -368,6 +397,37 @@ function animate() {
 		}
 
 	}
+
+	for (let y = 0; y < batallions.length; y++) {
+		const flock = batallions[y];
+		
+		let lowerPosition = 0.00501;
+
+		//console.log("Outside the for" + flock.position.y);
+
+		if (flock.posBoolY == true) {
+			flock.position.y -= lowerPosition;
+
+			//console.log("Update en el if booleano" + flock.position.y);
+			if(flock.position.y == 0){
+				vida = 0;
+				console.log(vida);
+			}
+		}
+
+		if(flock.position.y <= 8){
+			//console.log("Update en el if para descender " + flock.position.y);
+
+			flock.posBoolY = true;
+		
+		}else if(flock.position.y == 0){
+			console.log(flock.position.y);
+			vida = 0;
+
+			flock.posBoolY = false;
+		}
+	}
+	//console.log(vida);
 
 	floorUniforms.time.value += fract/10;
 }
