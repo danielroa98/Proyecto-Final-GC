@@ -32,12 +32,12 @@ let currentTime = Date.now();
 let batallions = [];
 
 //Load chicken with gun .obj and .mtl
-let objChickenGun = "../models/Chickens/chicken_w_gun.obj";
-let mtlChickenGun = "../models/Chickens/chicken_w_gun.mtl";
+let objChickenGun = "../models/Chickens/Pistola/chicken_w_gun.obj";
+let mtlChickenGun = "../models/Chickens/Pistola/chicken_w_gun.mtl";
 
 //Load chicken with knife .obj and .mtl
-let objChickenKnife = "../models/Chickens/chicken_w_knife.obj";
-let mtlChickenKnife = "../models/Chickens/chicken_w_knife.mtl";
+let objChickenKnife = "../models/Chickens/Cuchillo/chicken_knife.obj";
+let mtlChickenKnife = "../models/Chickens/Cuchillo/chicken_knife.mtl";
 
 //Enemy models
 enemyModels = [
@@ -145,13 +145,13 @@ async function loadObj(objModelUrl, holder, scale, zPos, yPos, xPos, xRot, yRot)
 	}
 }
 
-function loadObjWithMtl(enemyModels, enemyType) {
+function loadObjWithMtl(enemyModels) {
 	mtlLoader = new THREE.MTLLoader();
 
-	let enemyModelUrl = enemyModels[enemyType].modelo;
-	let mtlModelEnemy = enemyModels[enemyType].textura;
+	let enemyModelUrl = enemyModels.modelo;
+	let mtlModelEnemy = enemyModels.textura;
 
-	console.log(loadedEnemy);
+	// console.log(loadedEnemy);
 	console.log(enemyModelUrl);
 	console.log(mtlModelEnemy);
 
@@ -167,12 +167,12 @@ function loadObjWithMtl(enemyModels, enemyType) {
 		objLoader.load(enemyModelUrl, object => {
 			object.traverse(function (child) {
 				if (child.isMesh) {
-					child.geometry.computeVertexNormals();
-					// child.geometry.computeBoundingBox();
+					//child.geometry.computeVertexNormals();
+					child.geometry.computeBoundingBox();
 				}
 			});
 
-			objectList.push(object);
+			//objectList.push(object);
 			object.position.y = 6;
 			object.scale.set(2.5, 2.5, 2.5);
 			scene.add(object);
@@ -282,8 +282,13 @@ function createScene(canvas) {
 	}
 	console.log(batallions);
 
-	/* let enemyType = Math.floor((Math.random() * 2) + 0);
-	loadObjWithMtl(enemyModels, enemyType); */
+	for (let i = 0; i < enemyModels.length; i++) {
+		var element = enemyModels[i];
+		console.log(element);
+
+		loadObjWithMtl(element);
+	}
+	//loadObjWithMtl(enemyModels, enemyType);
 
 	scene.add(shipHolder);
 
@@ -351,7 +356,7 @@ function animate() {
 	let fract = deltat / 50;
 
 	timer-= 0.1;
-	console.log(timer);
+	// console.log(timer);
 	if(timer <= 0){
 		timer = 100;
 		for (let i = 0; i < 10; i++) {
@@ -361,7 +366,7 @@ function animate() {
 	
 			loadObj(pigUrl, temp, 0.25, 0.55, 6, i, Math.PI / 2, 0);
 	
-			console.log(enemyPos);
+			// console.log(enemyPos);
 	
 			scene.add(temp);
 			temp.posBool = false;
