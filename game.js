@@ -7,6 +7,8 @@ let camera = null;
 let orbitControls = null;
 let cube = null;
 
+let score = 0;
+
 let materials = null;
 
 let floorUniforms = null;
@@ -227,7 +229,7 @@ function createScene(canvas) {
 	scene.add(ambientLight);
 
 	shipHolder = new THREE.Object3D();
-	loadObj(objModelUrl, shipHolder, 0.1, 0.75, -8, 0, 0,Math.PI/2);
+	loadObj(objModelUrl, shipHolder, 0.1, 1, -8, 0, 0,Math.PI/2);
 
 	enemy = new THREE.Object3D();
 	
@@ -325,7 +327,22 @@ function createScene(canvas) {
 	text2.style.color= '#fc3003';
 	text2.id = "vida";
 	document.body.appendChild(text2);
+
+	var points = document.createElement('div');
+	points.style.position = 'absolute';
+	points.style.width = 100;
+	points.style.height = 100;
+	points.innerHTML = score;
+	points.style.top = 20 + 'px';
+	points.style.right = 300 + 'px';
+	points.style.fontSize = 60 + 'px';
+	points.style.color = '#e8e8e8';
+	points.id = "points";
+	document.body.appendChild(points);
+
 }
+
+let timer = 100;
 
 function animate() {
 	let now = Date.now();
@@ -333,9 +350,29 @@ function animate() {
     currentTime = now;
 	let fract = deltat / 50;
 
+	timer-= 0.1;
+	console.log(timer);
+	if(timer <= 0){
+		timer = 100;
+		for (let i = 0; i < 10; i++) {
+			let temp = new THREE.Object3D();
 	
-	/* let vidaText = document.getElementById("vida");
-	vidaText.innerHTML = vida; */
+			let enemyPos = (Math.random() * (-5)) + 5;
+	
+			loadObj(pigUrl, temp, 0.25, 0.55, 6, i, Math.PI / 2, 0);
+	
+			console.log(enemyPos);
+	
+			scene.add(temp);
+			temp.posBool = false;
+			temp.posBoolY = false;
+			batallions.push(temp);
+	
+		}
+	}
+
+	let scoreText = document.getElementById("points");
+	
 	
 
 	if(dKey && wKey) {
@@ -386,6 +423,11 @@ function animate() {
 			&& proj.obj.position.y >= (paloma.position.y - 0.3)){
 				console.log("Le di a paloma "+index2);
 				scene.remove(paloma);
+				scene.remove(proj.obj);
+				array.splice(index, 1);
+				array2.splice(index2, 1);
+				score += 1;
+				scoreText.innerHTML = score; 
 			}
 		})
 		proj.obj.position.y += fract*3 
@@ -583,7 +625,7 @@ function shoot() {
 
 	let projectile = new THREE.Mesh(geometry, material);
 
-	projectile.position.set(shipHolder.position.x, shipHolder.position.y, 0);
+	projectile.position.set(shipHolder.position.x, shipHolder.position.y, shipHolder.position.z);
 	projectilesCounter.push({obj: projectile, life: Date.now()});
 	scene.add(projectile);
 	console.log(projectilesCounter);
