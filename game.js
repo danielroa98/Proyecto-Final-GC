@@ -47,9 +47,9 @@ let loliMtl = "./models/LoliMod/C001.mtl";
 //Enemy models
 enemyModels = [
 	{modelo: objChickenGun, textura: mtlChickenGun}, 
-	{modelo: objChickenKnife, textura: mtlChickenKnife},
+	{modelo: objChickenKnife, textura: mtlChickenKnife}/* ,
 	{modelo: loliObj, textura: loliMtl},
-	{modelo: dinoObj, textura: dinoMtl}
+	{modelo: dinoObj, textura: dinoMtl} */
 ];
 
 function initControls() {
@@ -340,13 +340,27 @@ function createScene(canvas) {
 	text2.id = "vida";
 	document.body.appendChild(text2);
 
+	//Score text
+	var pointScore = document.createElement('div');
+	pointScore.style.position = 'absolute';
+	pointScore.style.width = 100;
+	pointScore.style.height = 100;
+	pointScore.innerHTML = 'Score: ';
+	pointScore.style.top = 20 + 'px';
+	pointScore.style.right = 200 + 'px';
+	pointScore.style.fontSize = 60 + 'px';
+	pointScore.style.color = '#e8e8e8';
+	pointScore.id = "pointScore";
+	document.body.insertBefore(pointScore, points);
+
+	//Scores
 	var points = document.createElement('div');
 	points.style.position = 'absolute';
 	points.style.width = 100;
 	points.style.height = 100;
 	points.innerHTML = score;
 	points.style.top = 20 + 'px';
-	points.style.right = 300 + 'px';
+	points.style.right = 5 + 'px';
 	points.style.fontSize = 60 + 'px';
 	points.style.color = '#e8e8e8';
 	points.id = "points";
