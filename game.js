@@ -1,6 +1,3 @@
-//import {MTLLoader} from 'three-mtl-loader';
-//const MTTLoader = require('three-mtl-loader');
-
 let renderer = null;
 let scene = null;
 let camera = null;
@@ -40,8 +37,8 @@ let objChickenKnife = "./models/Chickens/Cuchillo/chicken_knife.obj";
 let mtlChickenKnife = "./models/Chickens/Cuchillo/chicken_knife.mtl";
 
 //Load Dinosaur
-let	dinoObj = "./models/Dino/T_Rex.obj";
-let dinoMtl = "./models/Dino/T_Rex.mtl";
+let	dinoObj = "./models/Dino/Dino.obj";
+let dinoMtl = "./models/Dino/Dino.mtl";
 
 //Load Waifu
 let loliObj = "./models/LoliMod/C001.obj";
@@ -51,8 +48,8 @@ let loliMtl = "./models/LoliMod/C001.mtl";
 enemyModels = [
 	{modelo: objChickenGun, textura: mtlChickenGun}, 
 	{modelo: objChickenKnife, textura: mtlChickenKnife},
-	{modelo: loliObj, textura: loliMtl}
-	/* {modelo: dinoObj, textura: dinoMtl} */
+	{modelo: loliObj, textura: loliMtl},
+	{modelo: dinoObj, textura: dinoMtl}
 ];
 
 function initControls() {
