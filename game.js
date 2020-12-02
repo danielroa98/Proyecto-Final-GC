@@ -47,9 +47,9 @@ let loliMtl = "./models/LoliMod/C001.mtl";
 //Enemy models
 enemyModels = [
 	{modelo: objChickenGun, textura: mtlChickenGun}, 
-	{modelo: objChickenKnife, textura: mtlChickenKnife}/* ,
+	{modelo: objChickenKnife, textura: mtlChickenKnife},
 	{modelo: loliObj, textura: loliMtl},
-	{modelo: dinoObj, textura: dinoMtl} */
+	{modelo: dinoObj, textura: dinoMtl}
 ];
 
 function initControls() {
@@ -152,7 +152,7 @@ async function loadObj(objModelUrl, holder, scale, zPos, yPos, xPos, xRot, yRot)
 	}
 }
 
-function loadObjWithMtl(enemyModels) {
+function loadObjWithMtl(enemyModels, xPos, yPos, xRot, size) {
 	mtlLoader = new THREE.MTLLoader();
 
 	let enemyModelUrl = enemyModels.modelo;
@@ -180,8 +180,10 @@ function loadObjWithMtl(enemyModels) {
 			});
 
 			//objectList.push(object);
-			object.position.y = 6;
-			object.scale.set(2.5, 2.5, 2.5);
+			object.rotation.x = xRot;
+			object.position.x = xPos;
+			object.position.y = yPos;
+			object.scale.set(size, size, size);
 			scene.add(object);
 		});
 	});
@@ -240,6 +242,7 @@ function createScene(canvas) {
 
 	enemy = new THREE.Object3D();
 	
+	//Pidgeon back row
 	for (let i = 0; i < 10; i++) {
 		let temp = new THREE.Object3D();
 
@@ -251,11 +254,11 @@ function createScene(canvas) {
 
 		scene.add(temp);
 		temp.posBool = false;
-		temp.posBoolY = false;
 		batallions.push(temp);
 
 	}
 
+	//Pidgeon mid row
 	for (let i = 0; i < 10; i++) {
 		let temp = new THREE.Object3D();
 		
@@ -267,11 +270,11 @@ function createScene(canvas) {
 
 		scene.add(temp);
 		temp.posBool = false;
-		temp.posBoolY = false;
 		batallions.push(temp);
 
 	}
 
+	//Pidgeon front row
 	for (let i = 0; i < 10; i++) {
 		let temp = new THREE.Object3D();
 
@@ -283,17 +286,23 @@ function createScene(canvas) {
 
 		scene.add(temp);
 		temp.posBool = false;
-		temp.posBoolY = false;
 		batallions.push(temp);
 
 	}
-	console.log(batallions);
+
+	//console.log(batallions);
 
 	for (let i = 0; i < enemyModels.length; i++) {
 		var element = enemyModels[i];
-		console.log(element);
+		console.log(element + i);
 
-		loadObjWithMtl(element);
+		if(i == 0){
+			loadObjWithMtl(element, -12, 9, Math.PI / 2, 2.5);
+			loadObjWithMtl(element, 12, 9, Math.PI / 2, 2.5);
+		}else if(i === 3){
+			loadObjWithMtl(element, 0, 9, Math.PI / 2, 0.425);
+		}
+
 	}
 	//loadObjWithMtl(enemyModels, enemyType);
 
@@ -391,7 +400,6 @@ function animate() {
 	
 			scene.add(temp);
 			temp.posBool = false;
-			temp.posBoolY = false;
 			batallions.push(temp);
 	
 		}
