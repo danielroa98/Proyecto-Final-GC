@@ -25,6 +25,7 @@ let moveSpeed = 33;
 let projectilesCounter = [];
 let bolsaBolillos = [];
 let enemigos = [];
+let sombrerosSanta = [];
 
 let currentTime = Date.now();
 
@@ -683,15 +684,23 @@ function moveLeftDown() {
 }
 
 function shoot() {
-	let geometry = new THREE.SphereGeometry(0.2, 32, 32);
-	let material = new THREE.MeshBasicMaterial({color: "red"});
+	// let geometry = new THREE.SphereGeometry(0.2, 32, 32);
+	// let material = new THREE.MeshBasicMaterial({color: "red"});
 
-	let projectile = new THREE.Mesh(geometry, material);
+	// let projectile = new THREE.Mesh(geometry, material);
 
-	projectile.position.set(shipHolder.position.x, shipHolder.position.y, shipHolder.position.z);
-	projectilesCounter.push({obj: projectile, life: Date.now()});
-	scene.add(projectile);
-	console.log(projectilesCounter);
+	let sombreroSanta = {
+		modelo: santaObj,
+		textura: santaMtl
+	}
+
+	loadObjWithMtl(sombreroSanta, [shipHolder.position.x, shipHolder.position.y, shipHolder.position.z], [shipHolder.rotation.x, shipHolder.rotation.y, shipHolder.rotation.z], 0.5, projectilesCounter, 1);
+
+	// projectile.position.set(shipHolder.position.x, shipHolder.position.y, shipHolder.position.z);
+
+	// projectilesCounter.push({obj: projectile, life: Date.now()});
+	// scene.add(sombreroSanta);
+	// console.log(projectilesCounter);
 }
 
 function shootBolillo(paloma){
@@ -710,8 +719,4 @@ function shootBolillo(paloma){
 	//bolillo.position.set(paloma.position.x, paloma.position.y, paloma.position.z);
 	//bolsaBolillos.push({obj: bolillo, life: Date.now()});
 	//scene.add(bolillo);
-}
-
-function shootWaifu(){
-
 }
