@@ -300,7 +300,7 @@ function createScene(canvas) {
 			loadObjWithMtl(element, -12, 9, Math.PI / 2, 2.5);
 			loadObjWithMtl(element, 12, 9, Math.PI / 2, 2.5);
 		}else if(i === 3){
-			loadObjWithMtl(element, 0, 9, Math.PI / 2, 0.425);
+			loadObjWithMtl(element, 0, 15, Math.PI / 2, 0.425);
 		}
 
 	}
