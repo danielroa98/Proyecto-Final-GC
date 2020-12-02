@@ -23,6 +23,7 @@ let wKey = false, sKey = false, aKey = false, dKey = false;
 let moveSpeed = 33;
 
 let projectilesCounter = [];
+let bolsaBolillos = [];
 
 let currentTime = Date.now();
 
@@ -201,6 +202,25 @@ function run() {
 	orbitControls.update();
 }
 
+function createBatallion(num){
+	for (let i = 0; i < num; i++) {
+		let temp = new THREE.Object3D();
+
+		let enemyPos = (Math.random() * (-5)) + 5;
+
+		loadObj(pigUrl, temp, 0.25, 0.55, 8, i, Math.PI / 2, 0);
+
+		console.log(enemyPos);
+
+		scene.add(temp);
+		temp.posBool = false;
+		temp.posBoolY = false;
+		temp.timer = 10;
+		batallions.push(temp);
+
+	}
+}
+
 function createScene(canvas) {
 	// Create the Three.js renderer and attach it to our canvas
 	renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
@@ -240,53 +260,7 @@ function createScene(canvas) {
 
 	enemy = new THREE.Object3D();
 	
-	for (let i = 0; i < 10; i++) {
-		let temp = new THREE.Object3D();
-
-		let enemyPos = (Math.random() * (-5)) + 5;
-
-		loadObj(pigUrl, temp, 0.25, 0.55, 8, i, Math.PI / 2, 0);
-
-		console.log(enemyPos);
-
-		scene.add(temp);
-		temp.posBool = false;
-		temp.posBoolY = false;
-		batallions.push(temp);
-
-	}
-
-	for (let i = 0; i < 10; i++) {
-		let temp = new THREE.Object3D();
-		
-		let enemyPos = (Math.random()*(-5)) + 5;
-
-		loadObj(pigUrl, temp, 0.25, 0.55, 7, i, Math.PI/2, 0);
-	
-		console.log(enemyPos);
-
-		scene.add(temp);
-		temp.posBool = false;
-		temp.posBoolY = false;
-		batallions.push(temp);
-
-	}
-
-	for (let i = 0; i < 10; i++) {
-		let temp = new THREE.Object3D();
-
-		let enemyPos = (Math.random() * (-5)) + 5;
-
-		loadObj(pigUrl, temp, 0.25, 0.55, 6, i, Math.PI / 2, 0);
-
-		console.log(enemyPos);
-
-		scene.add(temp);
-		temp.posBool = false;
-		temp.posBoolY = false;
-		batallions.push(temp);
-
-	}
+	createBatallion(10);  
 	console.log(batallions);
 
 	for (let i = 0; i < enemyModels.length; i++) {
@@ -380,21 +354,7 @@ function animate() {
 	// console.log(timer);
 	if(timer <= 0){
 		timer = 100;
-		for (let i = 0; i < 10; i++) {
-			let temp = new THREE.Object3D();
-	
-			let enemyPos = (Math.random() * (-5)) + 5;
-	
-			loadObj(pigUrl, temp, 0.25, 0.55, 6, i, Math.PI / 2, 0);
-	
-			// console.log(enemyPos);
-	
-			scene.add(temp);
-			temp.posBool = false;
-			temp.posBoolY = false;
-			batallions.push(temp);
-	
-		}
+		createBatallion(10);
 	}
 
 	let scoreText = document.getElementById("points");
@@ -435,6 +395,33 @@ function animate() {
 		}
 	}
 
+	//Controlador de los bolillos
+	bolsaBolillos.forEach((bolillo, index, array) => {
+		if(Date.now() - bolillo.life > 2000) {
+			scene.remove(bolillo.obj);
+			array.splice(index, 1);
+		}
+
+		if(bolillo.obj.position.x <= (shipHolder.position.x + 1.5)
+			&& bolillo.obj.position.x >= (shipHolder.position.x - 1.5)
+			&& bolillo.obj.position.y <= (shipHolder.position.y + 1)
+			&& bolillo.obj.position.y >= (shipHolder.position.y - 1)
+			&& bolillo.obj.position.z <= (shipHolder.position.z + 1)
+			&& bolillo.obj.position.z >= (shipHolder.position.z - 1)){
+				
+				scene.remove(bolillo.obj);
+				array.splice(index, 1);
+				let vida = document.getElementById("vida");
+				let vidaText = vida.innerHTML - 10;
+				console.log(vida);
+				vida.innerHTML = vidaText; 
+			}
+
+
+		bolillo.obj.position.y -= fract*0.5 
+	})
+
+
 	projectilesCounter.forEach((proj, index, array) => {
 		if(Date.now() - proj.life > 1000) {
 			scene.remove(proj.obj);
@@ -443,10 +430,12 @@ function animate() {
 		//Calculo de colision con las palomas
 		batallions.forEach((paloma, index2, array2) =>{
 			//Ver boundries
-			if(proj.obj.position.x <= (paloma.position.x + 0.3)
-			&& proj.obj.position.x >= (paloma.position.x - 0.3)
-			&& proj.obj.position.y <= (paloma.position.y + 0.3)
-			&& proj.obj.position.y >= (paloma.position.y - 0.3)){
+			if(proj.obj.position.x <= (paloma.position.x + 0.5)
+			&& proj.obj.position.x >= (paloma.position.x - 0.5)
+			&& proj.obj.position.y <= (paloma.position.y + 0.5)
+			&& proj.obj.position.y >= (paloma.position.y - 0.5)
+			&& proj.obj.position.z <= (paloma.position.z + 10)
+			&& proj.obj.position.z >= (paloma.position.z - 10)){
 				console.log("Le di a paloma "+index2);
 				scene.remove(paloma);
 				scene.remove(proj.obj);
@@ -457,6 +446,21 @@ function animate() {
 			}
 		})
 		proj.obj.position.y += fract*3 
+	});
+
+	//Probabilidad de que paloma dispare un pan
+	batallions.forEach((paloma, index) => {
+		let temp = Math.random();
+		if(paloma.timer <= 0){
+			if(temp <= 0.25){
+				console.log("Paloma "+index+" lanza un pan");
+				shootBolillo(paloma);
+			}
+			paloma.timer = 30;
+		}
+		else {
+			paloma.timer -= 0.1;
+		}
 	});
 
 	for (let x = 0; x < batallions.length; x++) {
@@ -655,6 +659,17 @@ function shoot() {
 	projectilesCounter.push({obj: projectile, life: Date.now()});
 	scene.add(projectile);
 	console.log(projectilesCounter);
+}
+
+function shootBolillo(paloma){
+	let geometry = new THREE.SphereGeometry(0.2, 32, 32);
+	let material = new THREE.MeshBasicMaterial({color: "red"});
+
+	let bolillo = new THREE.Mesh(geometry, material);
+
+	bolillo.position.set(paloma.position.x, paloma.position.y, paloma.position.z);
+	bolsaBolillos.push({obj: bolillo, life: Date.now()});
+	scene.add(bolillo);
 }
 
 function shootWaifu(){
