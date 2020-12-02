@@ -24,6 +24,7 @@ let moveSpeed = 33;
 
 let projectilesCounter = [];
 let bolsaBolillos = [];
+let enemigos = [];
 
 let currentTime = Date.now();
 
@@ -37,20 +38,24 @@ let mtlChickenGun = "../models/Chickens/Pistola/chicken_w_gun.mtl";
 let objChickenKnife = "./models/Chickens/Cuchillo/chicken_knife.obj";
 let mtlChickenKnife = "./models/Chickens/Cuchillo/chicken_knife.mtl";
 
+//Load chicken with knife .obj and .mtl
+let objBolillo = "./models/Bolillo/Loaf of Bread for Export.obj";
+let mtlBolillo = "./models/Bolillo/Loaf of Bread for Export.mtl";
+
 //Load Dinosaur
 let	dinoObj = "./models/Dino/Dino.obj";
 let dinoMtl = "./models/Dino/Dino.mtl";
 
 //Load Waifu
-let loliObj = "./models/LoliMod/C001.obj";
-let loliMtl = "./models/LoliMod/C001.mtl";
+let loliObj = "./models/loli/C001.obj";
+let loliMtl = "./models/loli/C001.mtl";
 
 //Enemy models
 enemyModels = [
 	{modelo: objChickenGun, textura: mtlChickenGun}, 
-	{modelo: objChickenKnife, textura: mtlChickenKnife}/* ,
+	{modelo: objChickenKnife, textura: mtlChickenKnife},
 	{modelo: loliObj, textura: loliMtl},
-	{modelo: dinoObj, textura: dinoMtl} */
+	{modelo: dinoObj, textura: dinoMtl}
 ];
 
 function initControls() {
@@ -153,7 +158,7 @@ async function loadObj(objModelUrl, holder, scale, zPos, yPos, xPos, xRot, yRot)
 	}
 }
 
-function loadObjWithMtl(enemyModels) {
+function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet) {
 	mtlLoader = new THREE.MTLLoader();
 
 	let enemyModelUrl = enemyModels.modelo;
@@ -181,8 +186,17 @@ function loadObjWithMtl(enemyModels) {
 			});
 
 			//objectList.push(object);
-			object.position.y = 6;
-			object.scale.set(2.5, 2.5, 2.5);
+			object.rotation.x = rotations[0];
+			object.position.x = positions[0];
+			object.position.y = positions[1];
+			object.scale.set(size, size, size);
+			if(isBullet){
+				array.push({obj: object, life: Date.now()});
+			}
+			else{
+				array.push(object);
+			}
+			
 			scene.add(object);
 		});
 	});
@@ -200,6 +214,8 @@ function run() {
 
 	// Update the camera controller
 	orbitControls.update();
+
+	
 }
 
 function createBatallion(num){
@@ -265,9 +281,14 @@ function createScene(canvas) {
 
 	for (let i = 0; i < enemyModels.length; i++) {
 		var element = enemyModels[i];
-		console.log(element);
+		console.log(element + i);
 
-		loadObjWithMtl(element);
+		if(i == 0){
+			loadObjWithMtl(element, [12,9,0], [Math.PI / 2,0,0], 2.5, enemigos, 0);
+		}else if(i === 3){
+			loadObjWithMtl(element, [0, 15], [Math.PI / 2,0,0], 0.425, enemigos, 0);
+		}
+
 	}
 	//loadObjWithMtl(enemyModels, enemyType);
 
@@ -397,11 +418,13 @@ function animate() {
 
 	//Controlador de los bolillos
 	bolsaBolillos.forEach((bolillo, index, array) => {
+		//Vida de l Bolillo
 		if(Date.now() - bolillo.life > 2000) {
 			scene.remove(bolillo.obj);
 			array.splice(index, 1);
 		}
 
+		//Collision detecion del bolillo (bolillo -> pingu)
 		if(bolillo.obj.position.x <= (shipHolder.position.x + 1.5)
 			&& bolillo.obj.position.x >= (shipHolder.position.x - 1.5)
 			&& bolillo.obj.position.y <= (shipHolder.position.y + 1)
@@ -409,16 +432,18 @@ function animate() {
 			&& bolillo.obj.position.z <= (shipHolder.position.z + 1)
 			&& bolillo.obj.position.z >= (shipHolder.position.z - 1)){
 				
+				//Se detecta la colision
 				scene.remove(bolillo.obj);
 				array.splice(index, 1);
 				let vida = document.getElementById("vida");
 				let vidaText = vida.innerHTML - 10;
-				console.log(vida);
+				
 				vida.innerHTML = vidaText; 
 			}
 
-
-		bolillo.obj.position.y -= fract*0.5 
+		//Como se llama cada frame, actualizo su posicion
+		bolillo.obj.position.y -= fract*0.5
+		bolillo.obj.rotation.x += 0.5; 
 	})
 
 
@@ -662,14 +687,21 @@ function shoot() {
 }
 
 function shootBolillo(paloma){
-	let geometry = new THREE.SphereGeometry(0.2, 32, 32);
-	let material = new THREE.MeshBasicMaterial({color: "red"});
+	//let geometry = new THREE.SphereGeometry(0.2, 32, 32);
+	//let material = new THREE.MeshBasicMaterial({color: "red"});
 
-	let bolillo = new THREE.Mesh(geometry, material);
+	//let bolillo = new THREE.Mesh(geometry, material);
+	let bolillo = {
+		modelo: objBolillo,
+		textura: mtlBolillo
+	}
 
-	bolillo.position.set(paloma.position.x, paloma.position.y, paloma.position.z);
-	bolsaBolillos.push({obj: bolillo, life: Date.now()});
-	scene.add(bolillo);
+	loadObjWithMtl(bolillo, [paloma.position.x,paloma.position.y,paloma.position.z], [paloma.rotation.x, paloma.rotation.y, paloma.rotation.z], 5, bolsaBolillos, 1);
+	console.log(bolsaBolillos);
+
+	//bolillo.position.set(paloma.position.x, paloma.position.y, paloma.position.z);
+	//bolsaBolillos.push({obj: bolillo, life: Date.now()});
+	//scene.add(bolillo);
 }
 
 function shootWaifu(){
