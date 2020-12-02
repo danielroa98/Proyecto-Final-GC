@@ -50,6 +50,14 @@ let dinoMtl = "./models/Dino/Dino.mtl";
 let loliObj = "./models/loli/C001.obj";
 let loliMtl = "./models/loli/C001.mtl";
 
+//Load Mario
+let marioObj = "./models/Mario-File/Mario.obj";
+let marioMtl = "./models/Mario-File/Mario.mtl";
+
+//Load SantaHat
+let santaObj = "./models/Santa-hat/clowp.OBJ";
+let santaMtl = "./models/Santa-hat/clowp.mtl";
+
 //Enemy models
 enemyModels = [
 	{modelo: objChickenGun, textura: mtlChickenGun}, 
