@@ -36,6 +36,10 @@ let currentTime = Date.now();
 
 let batallions = [];
 
+//Load fish
+let objFish = "./models/Fish/fish.obj";
+let mtlFish = "../models/Fish/fish.mtl";
+
 //Load chicken with gun .obj and .mtl
 let objChickenGun = "./models/Chickens/Pistola/chicken_w_gun.obj";
 let mtlChickenGun = "../models/Chickens/Pistola/chicken_w_gun.mtl";
@@ -47,6 +51,9 @@ let mtlChickenKnife = "./models/Chickens/Cuchillo/chicken_knife.mtl";
 //Load chicken with knife .obj and .mtl
 let objBolillo = "./models/Bolillo/Loaf of Bread for Export.obj";
 let mtlBolillo = "./models/Bolillo/Loaf of Bread for Export.mtl";
+
+let objKnife = "./models/Knife/Kitchen_knife.obj";
+let mtlKnife = "./models/Knife/Kitchen_knife.mtl";
 
 //Load Dinosaur
 let dinoObj = "./models/Dino/Dino.obj";
@@ -171,7 +178,7 @@ async function loadObj(objModelUrl, holder, scale, zPos, yPos, xPos, xRot, yRot)
     }
 }
 
-function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet) {
+function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet, vida) {
     mtlLoader = new THREE.MTLLoader();
 
     let enemyModelUrl = enemyModels.modelo;
@@ -206,12 +213,19 @@ function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet
             object.position.y = positions[1];
 			object.scale.set(size, size, size);
 			object.posBool = false;
+			object.timer = 5;
+			object.vida = vida;
             if(isBullet){
                 array.push({obj: object, life: Date.now()});
             }
             else{
                 array.push(object);
-            }
+			}
+			
+			if(enemyModels.side != null){
+				object.side = enemyModels.side;
+				console.log(object.side);
+			}
             
             scene.add(object);
         });
@@ -413,11 +427,16 @@ function createScene(canvas) {
 
 }
 
-let timer = 100;
+let timer = 40;
 let waveTimer = 10;
+let dinoTimer = 100;
 
 let gallinas = [];
 let kevins = [];
+let balasKevin = [];
+let fishes = [];
+let dinos = [];
+let marioTimer = 20;
 
 function animate() {
     let now = Date.now();
@@ -427,17 +446,34 @@ function animate() {
 
 	timer-= 0.1;
 	waveTimer -= 0.1;
+	dinoTimer -= 0.1;
+
+	if(dinoTimer <= 0 && dinos.length == 0){
+		dinoTimer = 200;
+		spawnDino();
+	}
+
     //console.log(waveTimer);
     if(timer <= 0){
-        timer = 50 - (score*0.01);
+        timer = 40 - (score*0.01);
         createBatallion(10);
 	}
 	
 	//Create random Dino or Chicken
 	if(waveTimer <= 0){
-		waveTimer = 50;
-		loadObjWithMtl(enemyModels[1], [0,10,0], [Math.PI / 2,0,0], 1.5, gallinas, 0);
+		waveTimer = 40 - (score*0.01);
+		loadObjWithMtl(enemyModels[1], [0,10,0], [Math.PI / 2,0,0], 1.5, gallinas, 0,1);
 	}
+
+
+	dinos.forEach((element, index, array) => {
+		marioTimer -= 0.1;
+		if(marioTimer <= 0){
+			shootMario(element, 1.5);
+			marioTimer = 50;
+		}
+	})
+
 
 	gallinas.forEach((element, index) => {
 		let upPosition = 0.06;
@@ -463,10 +499,64 @@ function animate() {
 	});
 
 	kevins.forEach((element, index, array) => {
-		if(Date.now() - element.life > 2000) {
+		if(Date.now() - element.life > 4800) {
             scene.remove(element.obj);
             array.splice(index, 1);
+		}
+		//console.log(element.obj.timer);
+		
+		if(element.obj.timer <= 0){ 
+			element.obj.timer = 15;
+		
+		if(element.obj.position.x < 0){
+			loadObjWithMtl({modelo: objKnife, textura: mtlKnife, side: 0}, [element.obj.position.x,element.obj.position.y,element.obj.position.z], [element.obj.rotation.x, element.obj.rotation.y - 1.5, element.obj.rotation.z], 4, balasKevin, 1);
+		}
+		else {
+			loadObjWithMtl({modelo: objKnife, textura: mtlKnife, side: 1}, [element.obj.position.x,element.obj.position.y,element.obj.position.z], [element.obj.rotation.x, element.obj.rotation.y - 1.5, element.obj.rotation.z], 4, balasKevin, 1);
+
+		}
+
         }
+        else {
+            element.obj.timer -= 0.2;
+        }
+
+		element.obj.position.y -= fract*0.2;
+
+	});
+
+	balasKevin.forEach((element, index, array) => {
+		if(Date.now() - element.life > 4000) {
+            scene.remove(element.obj);
+            array.splice(index, 1);
+		}
+
+		//Collision detecion del bolillo (bolillo -> pingu)
+        if(element.obj.position.x <= (shipHolder.position.x + 1.5)
+            && element.obj.position.x >= (shipHolder.position.x - 1.5)
+            && element.obj.position.y <= (shipHolder.position.y + 1)
+            && element.obj.position.y >= (shipHolder.position.y - 1)
+            && element.obj.position.z <= (shipHolder.position.z + 1)
+            && element.obj.position.z >= (shipHolder.position.z - 1)){
+                
+                //Se detecta la colision
+                scene.remove(element.obj);
+                array.splice(index, 1);
+                vida = document.getElementById("vida");
+                vidaText = vida.innerHTML - 10;
+
+                vida.innerHTML = vidaText; 
+            }
+
+		//Como se llama cada frame, actualizo su posicion
+		if(element.obj.side == 0){
+			element.obj.position.x += fract*0.3;
+		}
+		else if(element.obj.side == 1){
+			element.obj.position.x -= fract*0.3;
+		}
+        
+        
 	})
 
     let scoreText = document.getElementById("points");
@@ -505,7 +595,37 @@ function animate() {
         if(shipHolder.position.y > -9) {
             moveDown();
         }
-    }
+	}
+	
+	//Controlador de pescados
+	fishes.forEach((fish, index, array) => {
+		if(Date.now() - fish.life > 4000) {
+            scene.remove(fish.obj);
+            array.splice(index, 1);
+		}
+
+		//Collision detecion del bolillo (bolillo -> pingu)
+        if(fish.obj.position.x <= (shipHolder.position.x + 1.5)
+            && fish.obj.position.x >= (shipHolder.position.x - 1.5)
+            && fish.obj.position.y <= (shipHolder.position.y + 1)
+            && fish.obj.position.y >= (shipHolder.position.y - 1)
+            && fish.obj.position.z <= (shipHolder.position.z + 1)
+            && fish.obj.position.z >= (shipHolder.position.z - 1)){
+                
+                //Se detecta la colision
+                scene.remove(fish.obj);
+				array.splice(index, 1);
+				vida = document.getElementById("vida");
+				if(parseInt(vida.innerHTML) <= 90){
+					vidaText = parseInt(vida.innerHTML) + 10;
+                	vida.innerHTML = vidaText; 
+				}
+                
+            }
+		
+		fish.obj.position.y -= 0.1;
+		fish.obj.rotation.z += 0.1;
+	})
 
     //Controlador de los bolillos
     bolsaBolillos.forEach((bolillo, index, array) => {
@@ -534,7 +654,7 @@ function animate() {
 
         //Como se llama cada frame, actualizo su posicion
         bolillo.obj.position.y -= fract*0.5
-        bolillo.obj.rotation.y += 0.5; 
+        bolillo.obj.rotation.y += 0.3; 
     })
 
     projectilesCounter.forEach((proj, index, array) => {
@@ -551,7 +671,13 @@ function animate() {
             && proj.obj.position.y >= (paloma.position.y - 0.5)
             && proj.obj.position.z <= (paloma.position.z + 10)
             && proj.obj.position.z >= (paloma.position.z - 10)){
-                console.log("Le di a paloma "+index2);
+				console.log("Le di a paloma "+index2);
+				//loadObjWithMtl({model: objFish, texture: mtlFish}, [paloma.position.x,paloma.position.y,paloma.position.z], [0,0,0], 1.5, fishes, 0,0);
+				
+				if(Math.random() < 0.1){
+					spawnfish(paloma);
+				}
+				
                 scene.remove(paloma);
                 scene.remove(proj.obj);
                 array.splice(index, 1);
@@ -569,16 +695,75 @@ function animate() {
             && proj.obj.position.y >= (paloma.position.y - 0.5)
             && proj.obj.position.z <= (paloma.position.z + 10)
             && proj.obj.position.z >= (paloma.position.z - 10)){
-                console.log("Le di a paloma "+index2);
-                scene.remove(paloma);
-                scene.remove(proj.obj);
-                array.splice(index, 1);
-                array2.splice(index2, 1);
-                score += 1;
-                scoreText.innerHTML = score; 
+				console.log("Le di a paloma "+index2);
+				if(paloma.vida > 0){
+					paloma.vida -= 1;
+				}
+				else{
+					scene.remove(paloma);
+					scene.remove(proj.obj);
+					array.splice(index, 1);
+					array2.splice(index2, 1);
+					score += 10;
+					scoreText.innerHTML = score;
+					
+					
+				}
+                
             }
 		});
 
+		//Calculo de colision con las gallinas
+        bolsaBolillos.forEach((paloma, index2, array2) =>{
+            //Ver boundries
+            if(proj.obj.position.x <= (paloma.obj.position.x + 0.5)
+            && proj.obj.position.x >= (paloma.obj.position.x - 0.5)
+            && proj.obj.position.y <= (paloma.obj.position.y + 0.5)
+            && proj.obj.position.y >= (paloma.obj.position.y - 0.5)
+            && proj.obj.position.z <= (paloma.obj.position.z + 10)
+            && proj.obj.position.z >= (paloma.obj.position.z - 10)){
+				console.log("Le di a paloma "+index2);
+				if(paloma.vida > 0){
+					paloma.vida -= 1;
+				}
+				else{
+					scene.remove(paloma.obj);
+					scene.remove(proj.obj);
+					array.splice(index, 1);
+					array2.splice(index2, 1);
+					score += 10;
+					scoreText.innerHTML = score; 	
+				}
+                
+            }
+		});
+
+		//Calculo de colision con las gallinas
+        dinos.forEach((paloma, index2, array2) =>{
+            //Ver boundries
+            if(proj.obj.position.x <= (paloma.position.x + 5)
+            && proj.obj.position.x >= (paloma.position.x - 5)
+            && proj.obj.position.y <= (paloma.position.y + 5)
+            && proj.obj.position.y >= (paloma.position.y - 5)
+            && proj.obj.position.z <= (paloma.position.z + 5)
+            && proj.obj.position.z >= (paloma.position.z - 5)){
+				console.log("VIDA DINO"+paloma.vida);
+				if(paloma.vida > 0){
+					paloma.vida -= 1;
+					scene.remove(proj.obj);
+					array.splice(index, 1);
+				}
+				else{
+					scene.remove(paloma);
+					scene.remove(proj.obj);
+					array.splice(index, 1);
+					array2.splice(index2, 1);
+					score += 10;
+					scoreText.innerHTML = score; 	
+				}
+                
+            }
+		});
 
         proj.obj.position.y += fract*3 
     });
@@ -814,20 +999,47 @@ function shootBolillo(paloma){
     //scene.add(bolillo);
 }
 
-function shootKevin(paloma, rotation){
+function spawnfish(paloma){
     //let geometry = new THREE.SphereGeometry(0.2, 32, 32);
     //let material = new THREE.MeshBasicMaterial({color: "red"});
 
     //let bolillo = new THREE.Mesh(geometry, material);
-    let bolillo = {
-        modelo: objBolillo,
-        textura: mtlBolillo
+    let fish = {
+        modelo: objFish,
+        textura: mtlFish
     }
 
-    loadObjWithMtl(enemyModels[0], [paloma.position.x,paloma.position.y,paloma.position.z], [paloma.rotation.x, rotation, paloma.rotation.z], 5, kevins, 1);
+    loadObjWithMtl(fish, [paloma.position.x,paloma.position.y,paloma.position.z], [paloma.rotation.x, 1.5, 0], 0.3, fishes, 1);
     console.log(bolsaBolillos);
 
     //bolillo.position.set(paloma.position.x, paloma.position.y, paloma.position.z);
     //bolsaBolillos.push({obj: bolillo, life: Date.now()});
     //scene.add(bolillo);
+}
+
+function shootKevin(paloma, rotation){
+    //let geometry = new THREE.SphereGeometry(0.2, 32, 32);
+    //let material = new THREE.MeshBasicMaterial({color: "red"});
+
+    //let bolillo = new THREE.Mesh(geometry, material);
+
+    loadObjWithMtl(enemyModels[0], [paloma.position.x,paloma.position.y,paloma.position.z], [paloma.rotation.x, rotation, paloma.rotation.z], 2, kevins, 1);
+    console.log(bolsaBolillos);
+
+    //bolillo.position.set(paloma.position.x, paloma.position.y, paloma.position.z);
+    //bolsaBolillos.push({obj: bolillo, life: Date.now()});
+    //scene.add(bolillo);
+}
+
+function spawnDino(){
+	loadObjWithMtl(enemyModels[3], [0,15,0], [Math.PI / 2,0,0], 0.5, dinos, 0, 10);
+}
+
+function shootMario(paloma, rotation){
+	let mario = {
+		modelo: marioObj,
+		textura: marioMtl
+	}
+	loadObjWithMtl(mario, [paloma.position.x,paloma.position.y,paloma.position.z], [2.7, 0, 0], 0.03, bolsaBolillos, 1);
+
 }
