@@ -27,6 +27,7 @@ let ObjectBolillo;
 let projectilesCounter = [];
 let bolsaBolillos = [];
 let enemigos = [];
+let sombrerosSanta = [];
 
 let currentTime = Date.now();
 
@@ -51,6 +52,14 @@ let dinoMtl = "./models/Dino/Dino.mtl";
 //Load Waifu
 let loliObj = "./models/loli/C001.obj";
 let loliMtl = "./models/loli/C001.mtl";
+
+//Load Mario
+let marioObj = "./models/Mario-File/Mario.obj";
+let marioMtl = "./models/Mario-File/Mario.mtl";
+
+//Load SantaHat
+let santaObj = "./models/Santa-hat/clowp.OBJ";
+let santaMtl = "./models/Santa-hat/clowp.mtl";
 
 //Enemy models
 enemyModels = [
@@ -159,8 +168,12 @@ async function loadObj(objModelUrl, holder, scale, zPos, yPos, xPos, xRot, yRot)
     }
 }
 
+var mesh;
+
 function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet) {
-    mtlLoader = new THREE.MTLLoader();
+	
+	
+	mtlLoader = new THREE.MTLLoader();
 
     let enemyModelUrl = enemyModels.modelo;
     let mtlModelEnemy = enemyModels.textura;
@@ -688,6 +701,7 @@ function shoot() {
     projectilesCounter.push({obj: projectile, life: Date.now()});
     scene.add(projectile);
     console.log(projectilesCounter);
+
 }
 
 function shootBolillo(paloma){
@@ -707,8 +721,3 @@ function shootBolillo(paloma){
     //bolsaBolillos.push({obj: bolillo, life: Date.now()});
     //scene.add(bolillo);
 }
-
-function shootWaifu(){
-
-}
-
