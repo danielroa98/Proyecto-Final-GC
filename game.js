@@ -24,6 +24,9 @@ let moveSpeed = 33;
 
 let ObjectBolillo;
 
+let vida = null;
+let vidaText = null;
+
 let projectilesCounter = [];
 let bolsaBolillos = [];
 let enemigos = [];
@@ -219,7 +222,10 @@ function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet
 }
 
 function run() {
-    requestAnimationFrame(() => {run();});
+
+    if(vidaText != 0){
+        requestAnimationFrame(() => {run();});
+    }
     
     // Render the scene
     renderer.render(scene, camera);
@@ -228,10 +234,11 @@ function run() {
 
     animate();
 
+    console.log()
+
     // Update the camera controller
     orbitControls.update();
 
-    
 }
 
 function createBatallion(num){
@@ -453,9 +460,9 @@ function animate() {
                 //Se detecta la colision
                 scene.remove(bolillo.obj);
                 array.splice(index, 1);
-                let vida = document.getElementById("vida");
-                let vidaText = vida.innerHTML - 10;
-                
+                vida = document.getElementById("vida");
+                vidaText = vida.innerHTML - 10;
+
                 vida.innerHTML = vidaText; 
             }
 
@@ -526,7 +533,6 @@ function animate() {
         }
 
     }
-    //console.log(vida);
 
     floorUniforms.time.value += fract/10;
 }
