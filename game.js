@@ -168,12 +168,8 @@ async function loadObj(objModelUrl, holder, scale, zPos, yPos, xPos, xRot, yRot)
     }
 }
 
-var mesh;
-
 function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet) {
-	
-	
-	mtlLoader = new THREE.MTLLoader();
+    mtlLoader = new THREE.MTLLoader();
 
     let enemyModelUrl = enemyModels.modelo;
     let mtlModelEnemy = enemyModels.textura;
@@ -205,7 +201,8 @@ function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet
             object.rotation.z = rotations[2];
             object.position.x = positions[0];
             object.position.y = positions[1];
-            object.scale.set(size, size, size);
+			object.scale.set(size, size, size);
+			object.posBool = false;
             if(isBullet){
                 array.push({obj: object, life: Date.now()});
             }
@@ -295,8 +292,11 @@ function createScene(canvas) {
     enemy = new THREE.Object3D();
     
     createBatallion(10);  
-    console.log(batallions);
+	console.log(batallions);
+	
+	console.log(enemyModels);
 
+	/*
     for (let i = 0; i < enemyModels.length; i++) {
         var element = enemyModels[i];
         console.log(element + i);
@@ -307,7 +307,8 @@ function createScene(canvas) {
             loadObjWithMtl(element, [0, 15], [Math.PI / 2,0,0], 0.425, enemigos, 0);
         }
 
-    }
+	}
+	*/
     //loadObjWithMtl(enemyModels, enemyType);
 
     scene.add(shipHolder);
@@ -382,6 +383,9 @@ function createScene(canvas) {
 }
 
 let timer = 100;
+let waveTimer = 10;
+
+let gallinas = [];
 
 function animate() {
     let now = Date.now();
@@ -389,12 +393,38 @@ function animate() {
     currentTime = now;
     let fract = deltat / 50;
 
-    timer-= 0.1;
-    // console.log(timer);
+	timer-= 0.1;
+	waveTimer -= 0.1;
+    //console.log(waveTimer);
     if(timer <= 0){
-        timer = 100;
+        timer = 50 - (score*0.1);
         createBatallion(10);
-    }
+	}
+	
+	//Create random Dino or Chicken
+	if(waveTimer <= 0){
+		waveTimer = 50;
+		loadObjWithMtl(enemyModels[1], [12,10,0], [Math.PI / 2,0,0], 1.5, gallinas, 0);
+	}
+
+	gallinas.forEach((element, index) => {
+		let upPosition = 0.06;
+        if(element.posBool == false){
+            element.position.x -= upPosition;
+        }
+        else if(element.posBool == true){
+            element.position.x += upPosition;
+        }
+
+        if( element.position.x <= -13){
+            element.posBool = true;
+            
+        }
+        else if (element.position.x >= 13){
+            element.posBool = false;
+            
+        }
+	})
 
     let scoreText = document.getElementById("points");
     
@@ -486,7 +516,27 @@ function animate() {
                 score += 1;
                 scoreText.innerHTML = score; 
             }
-        })
+		});
+		//Calculo de colision con las gallinas
+        gallinas.forEach((paloma, index2, array2) =>{
+            //Ver boundries
+            if(proj.obj.position.x <= (paloma.position.x + 0.5)
+            && proj.obj.position.x >= (paloma.position.x - 0.5)
+            && proj.obj.position.y <= (paloma.position.y + 0.5)
+            && proj.obj.position.y >= (paloma.position.y - 0.5)
+            && proj.obj.position.z <= (paloma.position.z + 10)
+            && proj.obj.position.z >= (paloma.position.z - 10)){
+                console.log("Le di a paloma "+index2);
+                scene.remove(paloma);
+                scene.remove(proj.obj);
+                array.splice(index, 1);
+                array2.splice(index2, 1);
+                score += 1;
+                scoreText.innerHTML = score; 
+            }
+		});
+
+
         proj.obj.position.y += fract*3 
     });
 
@@ -508,7 +558,7 @@ function animate() {
     for (let x = 0; x < batallions.length; x++) {
         const element = batallions[x];
 
-        let upPosition = 0.05;
+        let upPosition = 0.05 + (0.0005 * score);
         if(element.posBool == false){
             element.position.x -= upPosition;
         }
