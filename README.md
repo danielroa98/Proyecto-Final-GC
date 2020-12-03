@@ -48,3 +48,5 @@ El jugador deberá cambiar su estrategia constantemente para poder obtener una p
 
 La cantidad de disparos generados por parte de los enemigos va a depender de la punutación del jugador.
 Mientras mas alta, mas enemigos, mas disparos y mas destreza se deberá de tener. 
+
+Una vez que el jugador pierda, se detendrá toda la escena y aparecerá un _Game Over_.
