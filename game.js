@@ -11,8 +11,6 @@
 let renderer = null;
 let scene = null;
 let camera = null;
-let orbitControls = null;
-let cube = null;
 
 let score = 0;
 
@@ -295,9 +293,6 @@ function run() {
 
     console.log()
 
-    // Update the camera controller
-    orbitControls.update();
-
 }
 
 // Function used to create enemy groups,
@@ -327,8 +322,6 @@ function createScene(canvas) {
     // Create the Three.js renderer and attach it to our canvas
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 
-
-
     // Set the viewport size
     renderer.setSize(canvas.width, canvas.height);
 
@@ -346,10 +339,8 @@ function createScene(canvas) {
     // Add  a camera so we can view the scene
     camera = new THREE.PerspectiveCamera(45, canvas.width / canvas.height, 1, 4000);
     camera.position.set(0, -15, 15);
-    camera.rotation.x = Math.PI / 2;
+    camera.rotation.x = 365.2;
     scene.add(camera);
-
-    orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
 
     let directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(0, 50, 50);
@@ -755,7 +746,7 @@ function animate() {
                     scene.remove(proj.obj);
                     array.splice(index, 1);
                     array2.splice(index2, 1);
-                    score += 10;
+                    score += 20;
                     scoreText.innerHTML = score;
                 }
 
@@ -766,7 +757,7 @@ function animate() {
     });
 
     //Probabilidad de que paloma dispare un pan
-    batallions.forEach((paloma, index) => {
+    batallions.forEach((paloma, index, array) => {
         let temp = Math.random();
         if (paloma.timer <= 0) {
             if (temp <= 0.25) {
