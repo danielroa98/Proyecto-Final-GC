@@ -201,13 +201,13 @@ function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet
     let mtlModelEnemy = enemyModels.textura;
 
     // console.log(loadedEnemy);
-    console.log(enemyModelUrl);
-    console.log(mtlModelEnemy);
+    //console.log(enemyModelUrl);
+    //console.log(mtlModelEnemy);
 
     mtlLoader.load(mtlModelEnemy, materials => {
 
         materials.preload();
-        console.log(materials);
+        //console.log(materials);
 
         objLoader = new THREE.OBJLoader();
 
@@ -240,7 +240,7 @@ function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet
 
             if (enemyModels.side != null) {
                 object.side = enemyModels.side;
-                console.log(object.side);
+                //console.log(object.side);
             }
 
             scene.add(object);
@@ -291,7 +291,7 @@ function run() {
 
     animate();
 
-    console.log()
+    //console.log()
 
 }
 
@@ -305,7 +305,7 @@ function createBatallion(num) {
 
         loadObj(pigUrl, temp, 0.25, 0.55, 8, i, Math.PI / 2, 0);
 
-        console.log(enemyPos);
+        //console.log(enemyPos);
 
         scene.add(temp);
         temp.posBool = false;
@@ -355,7 +355,6 @@ function createScene(canvas) {
 
     enemy = new THREE.Object3D();
 
-    createBatallion(10);
     // console.log(batallions);
 
     // console.log(enemyModels);
@@ -659,7 +658,7 @@ function animate() {
                 && proj.obj.position.y >= (paloma.position.y - 0.5)
                 && proj.obj.position.z <= (paloma.position.z + 10)
                 && proj.obj.position.z >= (paloma.position.z - 10)) {
-                console.log("Le di a paloma " + index2);
+                //console.log("Le di a paloma " + index2);
                 //loadObjWithMtl({model: objFish, texture: mtlFish}, [paloma.position.x,paloma.position.y,paloma.position.z], [0,0,0], 1.5, fishes, 0,0);
 
                 if (Math.random() < 0.1) {
@@ -683,7 +682,7 @@ function animate() {
                 && proj.obj.position.y >= (paloma.position.y - 0.5)
                 && proj.obj.position.z <= (paloma.position.z + 10)
                 && proj.obj.position.z >= (paloma.position.z - 10)) {
-                console.log("Le di a paloma " + index2);
+                //console.log("Le di a paloma " + index2);
                 if (paloma.vida > 0) {
                     paloma.vida -= 1;
                 }
@@ -710,7 +709,7 @@ function animate() {
                 && proj.obj.position.y >= (paloma.obj.position.y - 0.5)
                 && proj.obj.position.z <= (paloma.obj.position.z + 10)
                 && proj.obj.position.z >= (paloma.obj.position.z - 10)) {
-                console.log("Le di a paloma " + index2);
+                //console.log("Le di a paloma " + index2);
                 if (paloma.vida > 0) {
                     paloma.vida -= 1;
                 }
@@ -735,7 +734,7 @@ function animate() {
                 && proj.obj.position.y >= (paloma.position.y - 5)
                 && proj.obj.position.z <= (paloma.position.z + 5)
                 && proj.obj.position.z >= (paloma.position.z - 5)) {
-                console.log("VIDA DINO" + paloma.vida);
+                //console.log("VIDA DINO" + paloma.vida);
                 if (paloma.vida > 0) {
                     paloma.vida -= 1;
                     scene.remove(proj.obj);
@@ -761,7 +760,7 @@ function animate() {
         let temp = Math.random();
         if (paloma.timer <= 0) {
             if (temp <= 0.25) {
-                console.log("Paloma " + index + " lanza un pan");
+                //console.log("Paloma " + index + " lanza un pan");
                 shootBolillo(paloma);
             }
             paloma.timer = 30 + (Math.random() * 1) + 10;
@@ -769,6 +768,24 @@ function animate() {
         else {
             paloma.timer -= 0.1;
         }
+
+        //Collision detecion del bolillo (bolillo -> pingu)
+        if( (shipHolder.position.x + 1.5) >= paloma.position.x
+            &&  (shipHolder.position.x - 1.5) <= paloma.position.x
+            &&  (shipHolder.position.y + 1) >= paloma.position.y
+            &&  (shipHolder.position.y - 1) <= paloma.position.y
+            &&  (shipHolder.position.z + 1) >= paloma.position.z
+            &&  (shipHolder.position.z - 1) <= paloma.position.z){
+                
+                //Se detecta la colision
+                scene.remove(paloma);
+                array.splice(index, 1);
+                vida = document.getElementById("vida");
+                vidaText = vida.innerHTML - 10;
+
+                vida.innerHTML = vidaText; 
+            }
+
     });
 
     for (let x = 0; x < batallions.length; x++) {
@@ -968,7 +985,7 @@ function shoot() {
     projectile.position.set(shipHolder.position.x, shipHolder.position.y, shipHolder.position.z);
     projectilesCounter.push({ obj: projectile, life: Date.now() });
     scene.add(projectile);
-    console.log(projectilesCounter);
+    //console.log(projectilesCounter);
 
 }
 
@@ -982,7 +999,7 @@ function shootBolillo(paloma) {
     }
 
     loadObjWithMtl(bolillo, [paloma.position.x, paloma.position.y, paloma.position.z], [paloma.rotation.x, paloma.rotation.y, 90], 5, bolsaBolillos, 1);
-    console.log(bolsaBolillos);
+    //console.log(bolsaBolillos);
 
 }
 
@@ -996,7 +1013,7 @@ function spawnfish(paloma) {
     }
 
     loadObjWithMtl(fish, [paloma.position.x, paloma.position.y, paloma.position.z], [paloma.rotation.x, 1.5, 0], 0.3, fishes, 1);
-    console.log(bolsaBolillos);
+    //console.log(bolsaBolillos);
 
 }
 
@@ -1006,7 +1023,7 @@ function spawnfish(paloma) {
 function shootKevin(paloma, rotation) {
 
     loadObjWithMtl(enemyModels[0], [paloma.position.x, paloma.position.y, paloma.position.z], [paloma.rotation.x, rotation, paloma.rotation.z], 2, kevins, 1);
-    console.log(bolsaBolillos);
+    //console.log(bolsaBolillos);
 
 }
 
