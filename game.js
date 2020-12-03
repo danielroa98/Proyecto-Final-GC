@@ -220,8 +220,32 @@ function loadObjWithMtl(enemyModels, positions, rotations, size, array, isBullet
 
 function run() {
 
-    if(vidaText != 0){
-        requestAnimationFrame(() => {run();});
+    if (vidaText != 0) {
+        requestAnimationFrame(() => { run(); });
+    
+    } else {
+        var restartGame = document.createElement('div');
+        restartGame.style.position = 'absolute';
+        restartGame.style.width = 16 + 'em';
+        restartGame.innerHTML = 'Reload this screen to try again';
+        restartGame.style.bottom = 200 + 'px';
+        restartGame.style.left = 15 + 'px';
+        restartGame.style.fontSize = 50 + 'px';
+        restartGame.style.color = '#ffffff';
+        restartGame.id = "restartGame";
+        document.body.appendChild(restartGame);
+        
+        var gameOver = document.createElement('div');
+        gameOver.style.position = 'absolute';
+        gameOver.style.width = 8 + 'em';
+        gameOver.innerHTML = 'GAMEOVER';
+        gameOver.style.bottom = 250 + 'px';
+        gameOver.style.left = 15 + 'px';
+        gameOver.style.fontSize = 60 + 'px';
+        gameOver.style.color = '#ffffff';
+        gameOver.id = "finit";
+        document.body.insertBefore(gameOver, restartGame);
+        
     }
     
     // Render the scene
@@ -251,7 +275,7 @@ function createBatallion(num){
         scene.add(temp);
         temp.posBool = false;
         temp.posBoolY = false;
-        temp.timer = 10;
+        temp.timer = 10 + (Math.random() * 1) + 5;
         batallions.push(temp);
 
     }
@@ -393,6 +417,7 @@ let timer = 100;
 let waveTimer = 10;
 
 let gallinas = [];
+let kevins = [];
 
 function animate() {
     let now = Date.now();
@@ -404,14 +429,14 @@ function animate() {
 	waveTimer -= 0.1;
     //console.log(waveTimer);
     if(timer <= 0){
-        timer = 50 - (score*0.1);
+        timer = 50 - (score*0.01);
         createBatallion(10);
 	}
 	
 	//Create random Dino or Chicken
 	if(waveTimer <= 0){
 		waveTimer = 50;
-		loadObjWithMtl(enemyModels[1], [12,10,0], [Math.PI / 2,0,0], 1.5, gallinas, 0);
+		loadObjWithMtl(enemyModels[1], [0,10,0], [Math.PI / 2,0,0], 1.5, gallinas, 0);
 	}
 
 	gallinas.forEach((element, index) => {
@@ -424,12 +449,23 @@ function animate() {
         }
 
         if( element.position.x <= -13){
-            element.posBool = true;
+			element.posBool = true;
+			shootKevin(element, 1.5);
             
         }
         else if (element.position.x >= 13){
-            element.posBool = false;
+			element.posBool = false;
+			shootKevin(element, 4.6);
             
+		}
+		
+		
+	});
+
+	kevins.forEach((element, index, array) => {
+		if(Date.now() - element.life > 2000) {
+            scene.remove(element.obj);
+            array.splice(index, 1);
         }
 	})
 
@@ -555,7 +591,7 @@ function animate() {
                 console.log("Paloma "+index+" lanza un pan");
                 shootBolillo(paloma);
             }
-            paloma.timer = 30;
+            paloma.timer = 30 +(Math.random() * 1) + 10;
         }
         else {
             paloma.timer -= 0.1;
@@ -565,7 +601,7 @@ function animate() {
     for (let x = 0; x < batallions.length; x++) {
         const element = batallions[x];
 
-        let upPosition = 0.05 + (0.0005 * score);
+        let upPosition = 0.05 + (0.00001 * score);
         if(element.posBool == false){
             element.position.x -= upPosition;
         }
@@ -771,6 +807,24 @@ function shootBolillo(paloma){
     }
 
     loadObjWithMtl(bolillo, [paloma.position.x,paloma.position.y,paloma.position.z], [paloma.rotation.x, paloma.rotation.y, 90], 5, bolsaBolillos, 1);
+    console.log(bolsaBolillos);
+
+    //bolillo.position.set(paloma.position.x, paloma.position.y, paloma.position.z);
+    //bolsaBolillos.push({obj: bolillo, life: Date.now()});
+    //scene.add(bolillo);
+}
+
+function shootKevin(paloma, rotation){
+    //let geometry = new THREE.SphereGeometry(0.2, 32, 32);
+    //let material = new THREE.MeshBasicMaterial({color: "red"});
+
+    //let bolillo = new THREE.Mesh(geometry, material);
+    let bolillo = {
+        modelo: objBolillo,
+        textura: mtlBolillo
+    }
+
+    loadObjWithMtl(enemyModels[0], [paloma.position.x,paloma.position.y,paloma.position.z], [paloma.rotation.x, rotation, paloma.rotation.z], 5, kevins, 1);
     console.log(bolsaBolillos);
 
     //bolillo.position.set(paloma.position.x, paloma.position.y, paloma.position.z);
